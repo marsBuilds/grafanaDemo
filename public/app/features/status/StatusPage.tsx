@@ -72,7 +72,7 @@ function getDatasourceColumns(): Array<Column<DatasourceHealth>> {
       header: 'Type',
       cell: ({ row }) => row.original.type,
     },
-    ...getBaseStatusColumns<DatasourceHealth>().filter((column) => column.id !== 'name'),
+    ...getBaseStatusColumns<DatasourceHealth>().filter((column) => column.id !== 'name' && column.id !== 'type'),
   ];
 }
 
