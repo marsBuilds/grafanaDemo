@@ -218,6 +218,13 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: () => <NavLandingPage navId="observability" />,
     },
     {
+      path: '/status',
+      roles: () => ['Admin'],
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "StatusPage" */ '../features/status/StatusPage')
+      ),
+    },
+    {
       path: '/infrastructure',
       component: () => <NavLandingPage navId="infrastructure" />,
     },

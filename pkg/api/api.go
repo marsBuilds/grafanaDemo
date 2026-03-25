@@ -167,6 +167,7 @@ func (hs *HTTPServer) registerRoutes() {
 	// Plugin details pages
 	r.Get("/connections/datasources/:id", middleware.CanAdminPlugins(hs.Cfg, hs.AccessControl), hs.Index)
 	r.Get("/connections/datasources/:id/page/:page", middleware.CanAdminPlugins(hs.Cfg, hs.AccessControl), hs.Index)
+	r.Get("/status", reqOrgAdmin, hs.Index)
 
 	// App Root Page
 	appPluginIDScope := pluginaccesscontrol.ScopeProvider.GetResourceScope(ac.Parameter(":id"))
@@ -453,6 +454,7 @@ func (hs *HTTPServer) registerRoutes() {
 		apiRoute.Get("/plugins/:pluginId/settings", routing.Wrap(hs.GetPluginSettingByID)) // RBAC check performed in handler for App Plugins
 		apiRoute.Get("/plugins/:pluginId/markdown/:name", routing.Wrap(hs.GetPluginMarkdown))
 		apiRoute.Get("/plugins/:pluginId/health", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), checkAppEnabled(hs.pluginStore, hs.PluginSettings), routing.Wrap(hs.CheckHealth))
+		apiRoute.Get("/status/health", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), reqOrgAdmin, routing.Wrap(hs.GetStatusHealth))
 		apiRoute.Any("/plugins/:pluginId/resources", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), authorize(ac.EvalPermission(pluginaccesscontrol.ActionAppAccess, pluginIDScope)), checkAppEnabled(hs.pluginStore, hs.PluginSettings), hs.CallResource)
 		apiRoute.Any("/plugins/:pluginId/resources/*", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), authorize(ac.EvalPermission(pluginaccesscontrol.ActionAppAccess, pluginIDScope)), checkAppEnabled(hs.pluginStore, hs.PluginSettings), hs.CallResource)
 		apiRoute.Get("/plugins/errors", routing.Wrap(hs.GetPluginErrorsList))
