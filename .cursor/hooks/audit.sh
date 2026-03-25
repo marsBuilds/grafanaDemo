@@ -1,19 +1,25 @@
 #!/bin/bash
 
-# audit.sh - Hook script that writes all JSON input to /tmp/agent-audit.log
-# This script is designed to be called by Cursor's hooks system for auditing purposes
+# audit.sh - Append hook JSON payloads to .cursor/audits/agent-audit.md (Markdown).
 
-# Read JSON input from stdin
 json_input=$(cat)
-
-# Create timestamp for the log entry
 timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Create the log directory if it doesn't exist
-mkdir -p "$(dirname /tmp/agent-audit.log)"
+# .cursor/audits is a sibling of .cursor/hooks (this script)
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+AUDIT_DIR="${HOOK_DIR}/../audits"
+LOG_FILE="${AUDIT_DIR}/agent-audit.md"
 
-# Write the timestamped JSON entry to the audit log
-echo "[$timestamp] $json_input" >> /tmp/agent-audit.log
+mkdir -p "$AUDIT_DIR"
 
-# Exit successfully
+if [[ ! -f "$LOG_FILE" ]]; then
+  printf '# Cursor hook audit log\n\n' >> "$LOG_FILE"
+fi
+
+{
+  printf '## %s\n\n```json\n' "$timestamp"
+  printf '%s\n' "$json_input"
+  printf '```\n\n'
+} >> "$LOG_FILE"
+
 exit 0

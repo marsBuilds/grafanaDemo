@@ -3,7 +3,7 @@
   "hooks": {
     "sessionEnd": [
       {
-        "command": "./hooks/audit.sh"
+        "command": ".cursor/hooks/audit.sh"
       }
     ],
     "beforeShellExecution": [
@@ -12,17 +12,17 @@
         "matcher": "(^|\\s)gh(\\s|$)"
       },
       {
-        "command": "./hooks/audit.sh"
+        "command": ".cursor/hooks/audit.sh"
       }
     ],
     "afterFileEdit": [
       {
-        "command": "./hooks/audit.sh"
+        "command": ".cursor/hooks/audit.sh"
       }
     ],
     "beforeSubmitPrompt": [
       {
-        "command": "./hooks/audit.sh"
+        "command": ".cursor/hooks/audit.sh"
       }
     ]
   }
