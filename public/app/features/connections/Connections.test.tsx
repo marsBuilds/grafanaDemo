@@ -1,4 +1,4 @@
-import { RenderResult, screen, waitFor } from '@testing-library/react';
+import { RenderResult, screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom-v5-compat';
 import { render } from 'test/test-utils';
 
@@ -108,12 +108,15 @@ describe('Connections', () => {
 
     expect(await screen.findByText('Data source status')).toBeVisible();
     expect(await screen.findByText('Refresh checks')).toBeVisible();
+    expect(await screen.findByText('Healthy')).toBeVisible();
+    expect(await screen.findByText('Warnings')).toBeVisible();
+    expect(await screen.findByText('Errors')).toBeVisible();
 
     await waitFor(() => {
-      expect(screen.getByText('3')).toBeVisible();
-      expect(screen.getByText('1')).toBeVisible();
       expect(screen.getByText('Authentication expires soon')).toBeVisible();
       expect(screen.getByText('Connection failed')).toBeVisible();
+      expect(screen.getAllByText('Connected')).toHaveLength(1);
+      expect(api.checkDataSourceHealth).toHaveBeenCalledTimes(3);
     });
   });
 
