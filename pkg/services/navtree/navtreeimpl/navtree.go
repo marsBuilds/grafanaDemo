@@ -631,6 +631,14 @@ func (s *ServiceImpl) buildDataConnectionsNavLink(c *contextmodel.ReqContext) *n
 			Url:      baseUrl + "/datasources",
 			Children: []*navtree.NavLink{},
 		})
+
+		children = append(children, &navtree.NavLink{
+			Id:       "connections-datasources-status",
+			Text:     "Status",
+			SubTitle: "Check the live health of your connected data sources",
+			Url:      baseUrl + "/datasources/status",
+			Children: []*navtree.NavLink{},
+		})
 	}
 
 	if len(children) > 0 {

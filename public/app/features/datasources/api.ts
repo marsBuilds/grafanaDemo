@@ -1,6 +1,6 @@
 import { lastValueFrom } from 'rxjs';
 
-import { DataSourceSettings, DataSourceJsonData } from '@grafana/data';
+import { DataSourceSettings, DataSourceJsonData, TestDataSourceResponse } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { getFeatureFlagClient } from '@grafana/runtime/internal';
 import { getBackendSrv } from 'app/core/services/backend_srv';
@@ -8,6 +8,18 @@ import { accessControlQueryParam } from 'app/core/utils/accessControl';
 
 export const getDataSources = async (): Promise<DataSourceSettings[]> => {
   return await getBackendSrv().get('/api/datasources');
+};
+
+export const checkDataSourceHealth = async (uid: string): Promise<TestDataSourceResponse> => {
+  return lastValueFrom(
+    getBackendSrv().fetch<TestDataSourceResponse>({
+      method: 'GET',
+      url: `/api/datasources/uid/${uid}/health`,
+      showErrorAlert: false,
+    })
+  )
+    .then((response) => response.data)
+    .catch((error) => error.data ?? { status: 'error', message: error.statusText ?? 'Health check failed' });
 };
 
 // From pkg/storage/unified/apistore/secure.go
