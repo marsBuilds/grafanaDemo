@@ -254,6 +254,12 @@ export const navIndex: NavIndex = {
         url: '/connections/datasources',
       },
       {
+        id: 'connections-datasources-status',
+        text: 'Status',
+        subTitle: 'Check the health of your configured data sources',
+        url: '/connections/datasources/status',
+      },
+      {
         id: 'standalone-plugin-page-/connections/infrastructure',
         text: 'Infrastructure',
         url: '/connections/infrastructure',
@@ -273,6 +279,12 @@ export const navIndex: NavIndex = {
     text: 'Data sources',
     subTitle: 'Manage your existing datasource connections',
     url: '/connections/datasources',
+  },
+  'connections-datasources-status': {
+    id: 'connections-datasources-status',
+    text: 'Status',
+    subTitle: 'Check the health of your configured data sources',
+    url: '/connections/datasources/status',
   },
   'standalone-plugin-page-/connections/infrastructure': {
     id: 'standalone-plugin-page-/connections/infrastructure',

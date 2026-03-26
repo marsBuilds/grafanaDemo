@@ -1,4 +1,4 @@
-import { RenderResult, screen } from '@testing-library/react';
+import { RenderResult, screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom-v5-compat';
 import { render } from 'test/test-utils';
 
@@ -95,6 +95,29 @@ describe('Connections', () => {
     renderPage(ROUTES.AddNewConnection);
 
     expect(await screen.findByText('No results matching your query were found')).toBeVisible();
+  });
+
+  test('renders the data source status page with health summaries', async () => {
+    (api.checkDataSourceHealth as jest.Mock) = jest
+      .fn()
+      .mockResolvedValueOnce({ status: 'success', message: 'Connected' })
+      .mockResolvedValueOnce({ status: 'warning', message: 'Authentication expires soon' })
+      .mockResolvedValueOnce({ status: 'error', message: 'Connection failed' });
+
+    renderPage(ROUTES.DataSourcesStatus);
+
+    expect(await screen.findByText('Data source status')).toBeVisible();
+    expect(await screen.findByText('Refresh checks')).toBeVisible();
+    expect(await screen.findByText('Healthy')).toBeVisible();
+    expect(await screen.findByText('Warnings')).toBeVisible();
+    expect(await screen.findByText('Errors')).toBeVisible();
+
+    await waitFor(() => {
+      expect(screen.getByText('Authentication expires soon')).toBeVisible();
+      expect(screen.getByText('Connection failed')).toBeVisible();
+      expect(screen.getAllByText('Connected')).toHaveLength(1);
+      expect(api.checkDataSourceHealth).toHaveBeenCalledTimes(3);
+    });
   });
 
   test('does not render anything for the "Add new connection" page in case it is displayed by a standalone plugin page', async () => {
