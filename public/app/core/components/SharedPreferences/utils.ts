@@ -82,6 +82,8 @@ export const getRegionalFormatOptions = (): ComboboxOption[] => {
   return options;
 };
 
+export { getTranslatedThemeName };
+
 export const getStyles = () => {
   return {
     labelText: css({
