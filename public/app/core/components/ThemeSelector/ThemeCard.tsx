@@ -1,10 +1,10 @@
 import { css } from '@emotion/css';
 
 import { FeatureState, GrafanaTheme2, ThemeRegistryItem } from '@grafana/data';
-import { t } from '@grafana/i18n';
 import { FeatureBadge, RadioButtonDot, useStyles2 } from '@grafana/ui';
 
 import { ThemePreview } from '../Theme/ThemePreview';
+import { getTranslatedThemeName } from './themeNames';
 
 interface ThemeCardProps {
   themeOption: ThemeRegistryItem;
@@ -67,16 +67,3 @@ const getStyles = (theme: GrafanaTheme2) => {
     }),
   };
 };
-
-function getTranslatedThemeName(theme: ThemeRegistryItem) {
-  switch (theme.id) {
-    case 'dark':
-      return t('shared.preferences.theme.dark-label', 'Dark');
-    case 'light':
-      return t('shared.preferences.theme.light-label', 'Light');
-    case 'system':
-      return t('shared.preferences.theme.system-label', 'System preference');
-    default:
-      return theme.name;
-  }
-}

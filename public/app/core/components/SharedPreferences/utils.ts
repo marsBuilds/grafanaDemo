@@ -1,10 +1,11 @@
 import { css } from '@emotion/css';
 
 import { PreferencesSpec as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
-import { ThemeRegistryItem } from '@grafana/data';
 import { LANGUAGES, PSEUDO_LOCALE, t } from '@grafana/i18n';
 import { ComboboxOption } from '@grafana/ui';
 import { LOCALES } from 'app/core/internationalization/locales';
+
+import { getTranslatedThemeName } from '../ThemeSelector/themeNames';
 
 export interface Props {
   resourceUri: string;
@@ -79,19 +80,6 @@ export const getRegionalFormatOptions = (): ComboboxOption[] => {
     ...localeOptions,
   ];
   return options;
-};
-
-export const getTranslatedThemeName = (theme: ThemeRegistryItem) => {
-  switch (theme.id) {
-    case 'dark':
-      return t('shared.preferences.theme.dark-label', 'Dark');
-    case 'light':
-      return t('shared.preferences.theme.light-label', 'Light');
-    case 'system':
-      return t('shared.preferences.theme.system-label', 'System preference');
-    default:
-      return theme.name;
-  }
 };
 
 export const getStyles = () => {

@@ -2,7 +2,7 @@ import { comboboxTestSetup } from 'test/helpers/comboboxTestSetup';
 import { getSelectParent, selectOptionInTest } from 'test/helpers/selectOptionInTest';
 import { render, screen, userEvent, waitFor, within } from 'test/test-utils';
 
-import { setBackendSrv } from '@grafana/runtime';
+import { config, setBackendSrv } from '@grafana/runtime';
 import { setupMockServer } from '@grafana/test-utils/server';
 import { getFolderFixtures } from '@grafana/test-utils/unstable';
 import { backendSrv } from 'app/core/services/backend_srv';
@@ -37,6 +37,7 @@ const setup = async () => {
 
 const original = window.location;
 const mockReload = jest.fn();
+const originalGrafanaconThemes = config.featureToggles.grafanaconThemes;
 
 beforeAll(() => {
   Object.defineProperty(window, 'location', {
@@ -56,11 +57,25 @@ afterAll(() => {
   });
 });
 
+afterEach(() => {
+  config.featureToggles.grafanaconThemes = originalGrafanaconThemes;
+});
+
 describe('SharedPreferences', () => {
   it('renders the theme preference', async () => {
     await setup();
     const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
     await waitFor(() => expect(themeSelect).toHaveValue('Light'));
+  });
+
+  it('renders the orange experimental theme when grafanacon themes are enabled', async () => {
+    config.featureToggles.grafanaconThemes = true;
+    const { user } = await setup();
+    const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
+
+    await user.click(themeSelect);
+
+    expect(await screen.findByRole('option', { name: 'Orange' })).toBeInTheDocument();
   });
 
   it('renders the home dashboard preference', async () => {

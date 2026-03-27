@@ -18,6 +18,13 @@ describe('ThemeCard', () => {
     build: createTheme,
   };
 
+  const marsTheme: ThemeRegistryItem = {
+    id: 'mars',
+    name: 'Mars',
+    build: createTheme,
+    isExtra: true,
+  };
+
   it('should only call onSelect once when clicking the radio button dot', async () => {
     const onSelectMock = jest.fn();
 
@@ -31,5 +38,12 @@ describe('ThemeCard', () => {
 
     // Check that onSelect was called only once
     expect(onSelectMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the orange label for the mars theme', () => {
+    render(<ThemeCard themeOption={marsTheme} onSelect={jest.fn()} isSelected={false} isExperimental />);
+
+    expect(screen.getByRole('radio', { name: 'Orange' })).toBeInTheDocument();
+    expect(screen.getByText('Experimental')).toBeInTheDocument();
   });
 });
