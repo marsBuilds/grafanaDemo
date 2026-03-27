@@ -30,7 +30,7 @@ const selectComboboxOptionInTest = async (input: HTMLElement, optionOrOptions: s
 
 const setup = async () => {
   const view = render(<SharedPreferences resourceUri="user" preferenceType="user" />);
-  const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
+  const themeSelect = await screen.findByRole('combobox', { name: /interface theme/i });
   await waitFor(() => expect(themeSelect).not.toBeDisabled());
   return view;
 };
@@ -64,14 +64,14 @@ afterEach(() => {
 describe('SharedPreferences', () => {
   it('renders the theme preference', async () => {
     await setup();
-    const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
+    const themeSelect = await screen.findByRole('combobox', { name: /interface theme/i });
     await waitFor(() => expect(themeSelect).toHaveValue('Light'));
   });
 
   it('renders the orange experimental theme when grafanacon themes are enabled', async () => {
     config.featureToggles.grafanaconThemes = true;
     const { user } = await setup();
-    const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
+    const themeSelect = await screen.findByRole('combobox', { name: /interface theme/i });
 
     await user.click(themeSelect);
 
@@ -127,7 +127,7 @@ describe('SharedPreferences', () => {
     const capture = captureRequests();
     const { user } = await setup();
 
-    await selectComboboxOptionInTest(await screen.findByRole('combobox', { name: 'Interface theme' }), 'Dark');
+    await selectComboboxOptionInTest(await screen.findByRole('combobox', { name: /interface theme/i }), 'Dark');
     await selectComboboxOptionInTest(
       await screen.findByRole('combobox', { name: /home dashboard/i }),
       new RegExp(dashboardToSelect.title)
@@ -156,7 +156,7 @@ describe('SharedPreferences', () => {
   it('saves the users default preferences', async () => {
     const capture = captureRequests();
     const { user } = await setup();
-    await selectComboboxOptionInTest(await screen.findByRole('combobox', { name: 'Interface theme' }), 'Default');
+    await selectComboboxOptionInTest(await screen.findByRole('combobox', { name: /interface theme/i }), 'Default');
 
     // there's no default option in this dropdown - there's a clear selection button
     // get the parent container, and find the "Clear value" button
