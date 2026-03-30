@@ -29,7 +29,7 @@ import {
 } from 'app/features/dashboard/services/DashboardProfiler';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 import { PanelModel } from 'app/features/dashboard/state/PanelModel';
-import { DashboardDTO, DashboardDataDTO } from 'app/types/dashboard';
+import { DashboardDTO, DashboardDataDTO, DashboardRoutes } from 'app/types/dashboard';
 
 import { addPanelsOnLoadBehavior } from '../addToDashboard/addPanelsOnLoadBehavior';
 import { dashboardAnalyticsInitializer } from '../behaviors/DashboardAnalyticsInitializerBehavior';
@@ -417,6 +417,7 @@ export function createDashboardSceneFromDashboardModel(
       editable: oldModel.editable,
       preload: dto.preload ?? false,
       isDirty: false,
+      isHomeDashboard: options?.route === DashboardRoutes.Home,
       links: [...(options?.defaultLinks ?? []), ...(oldModel.links ?? [])],
       meta: oldModel.meta,
       tags: oldModel.tags || [],

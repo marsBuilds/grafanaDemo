@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { config } from '@grafana/runtime';
+import { config, RefreshEvent } from '@grafana/runtime';
 import {
   AdHocFiltersVariable,
   GroupByVariable,
@@ -112,6 +113,26 @@ describe('DashboardControls', () => {
       expect(await renderer.findByTestId(selectors.components.TimePicker.openButton)).toBeInTheDocument();
       expect(await renderer.findByTestId(selectors.components.RefreshPicker.runButtonV2)).toBeInTheDocument();
       expect(await renderer.findByTestId(selectors.pages.Dashboard.SubMenu.submenuItem)).toBeInTheDocument();
+    });
+
+    it('should show a Sync button on the home dashboard and publish a refresh event when clicked', async () => {
+      const { dashboard, controls } = buildTestDashboard({ isHomeDashboard: true });
+      const refreshHandler = jest.fn();
+      dashboard.subscribeToEvent(RefreshEvent, refreshHandler);
+
+      render(<controls.Component model={controls} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Sync' }));
+
+      expect(refreshHandler).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not show a Sync button on non-home dashboards', () => {
+      const scene = buildTestScene();
+
+      render(<scene.Component model={scene} />);
+
+      expect(screen.queryByRole('button', { name: 'Sync' })).not.toBeInTheDocument();
     });
 
     it('should render with hidden controls', async () => {
@@ -380,6 +401,16 @@ function buildTestSceneWithEditable(options: {
 }
 
 function buildTestScene(state?: Partial<DashboardControlsState>): DashboardControls {
+  return buildTestDashboard().controls;
+}
+
+function buildTestDashboard({
+  controlsState,
+  isHomeDashboard = false,
+}: {
+  controlsState?: Partial<DashboardControlsState>;
+  isHomeDashboard?: boolean;
+} = {}): { dashboard: DashboardScene; controls: DashboardControls } {
   const variable = new TextBoxVariable({
     name: 'A',
     label: 'A',
@@ -389,6 +420,7 @@ function buildTestScene(state?: Partial<DashboardControlsState>): DashboardContr
   });
   const dashboard = new DashboardScene({
     uid: 'A',
+    isHomeDashboard,
     links: [
       {
         title: 'Link',
@@ -420,12 +452,15 @@ function buildTestScene(state?: Partial<DashboardControlsState>): DashboardContr
       variables: [variable],
     }),
     controls: new DashboardControls({
-      ...state,
+      ...controlsState,
     }),
   });
 
   dashboard.activate();
   variable.activate();
 
-  return dashboard.state.controls as DashboardControls;
+  return {
+    dashboard,
+    controls: dashboard.state.controls as DashboardControls,
+  };
 }

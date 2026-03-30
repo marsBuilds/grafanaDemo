@@ -3,7 +3,7 @@ import { css, cx } from '@emotion/css';
 import { GrafanaTheme2, VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { Trans } from '@grafana/i18n';
-import { config } from '@grafana/runtime';
+import { config, RefreshEvent } from '@grafana/runtime';
 import {
   SceneObjectState,
   SceneObjectBase,
@@ -18,7 +18,7 @@ import {
   CancelActivationHandler,
   sceneUtils,
 } from '@grafana/scenes';
-import { Box, Button, useStyles2 } from '@grafana/ui';
+import { Box, Button, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 import { ContextualNavigationPaneToggle } from 'app/features/scopes/dashboards/ContextualNavigationPaneToggle';
 
@@ -150,6 +150,7 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
   } = model.useState();
   const dashboard = getDashboardSceneFor(model);
   const { links, editPanel, isEditing } = dashboard.useState();
+  const showHomeSyncButton = Boolean(dashboard.state.isHomeDashboard) && !hideTimeControls;
   const isQueryEditorNext = Boolean(editPanel?.state.useQueryExperienceNext);
   const styles = useStyles2(getStyles, isQueryEditorNext);
   const showDebugger = window.location.search.includes('scene-debugger');
@@ -204,6 +205,7 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
           <div className={cx(styles.rightControlsNewLayout, editPanel && styles.rightControlsWrap)}>
             {!hideTimeControls && (
               <div className={styles.fixedControlsNewLayout}>
+                {showHomeSyncButton && <HomeSyncButton dashboard={dashboard} />}
                 <timePicker.Component model={timePicker} />
                 <refreshPicker.Component model={refreshPicker} />
               </div>
@@ -243,6 +245,7 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
       <div className={cx(styles.rightControls, editPanel && styles.rightControlsWrap)}>
         {!hideTimeControls && (
           <div className={styles.fixedControls}>
+            {showHomeSyncButton && <HomeSyncButton dashboard={dashboard} />}
             <timePicker.Component model={timePicker} />
             <refreshPicker.Component model={refreshPicker} />
           </div>
@@ -272,6 +275,19 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
       {editPanel && <PanelEditControls panelEditor={editPanel} />}
       {showDebugger && <SceneDebugger scene={model} key={'scene-debugger'} />}
     </div>
+  );
+}
+
+function HomeSyncButton({ dashboard }: { dashboard: DashboardScene }) {
+  return (
+    <ToolbarButton
+      variant="secondary"
+      icon="sync"
+      onClick={() => dashboard.publishEvent(new RefreshEvent())}
+      data-testid="data-testid Home dashboard sync button"
+    >
+      <Trans i18nKey="dashboard.controls.home-sync">Sync</Trans>
+    </ToolbarButton>
   );
 }
 

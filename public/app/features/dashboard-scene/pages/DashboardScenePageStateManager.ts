@@ -194,7 +194,7 @@ abstract class DashboardScenePageStateManagerBase<T>
   private async loadHomeDashboard(): Promise<DashboardScene | null> {
     const rsp = await this.fetchHomeDashboard();
     if (rsp) {
-      return transformSaveModelToScene(rsp, undefined, getSceneCreationOptions());
+      return transformSaveModelToScene(rsp, { uid: '', route: DashboardRoutes.Home }, getSceneCreationOptions());
     }
 
     return null;

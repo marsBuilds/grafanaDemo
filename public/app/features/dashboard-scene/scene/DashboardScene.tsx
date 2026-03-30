@@ -141,6 +141,8 @@ export interface DashboardSceneState extends SceneObjectState {
   isEditing?: boolean;
   /** True when user made a change */
   isDirty?: boolean;
+  /** True when rendering the / home dashboard route */
+  isHomeDashboard?: boolean;
   /** meta flags */
   meta: Omit<DashboardMeta, 'isNew'>;
   /** Version of the dashboard */
@@ -869,6 +871,10 @@ export class DashboardScene extends SceneObjectBase<DashboardSceneState> impleme
 
   public onOpenSettings = () => {
     locationService.partial({ editview: 'settings' });
+  };
+
+  public onSyncDashboard = () => {
+    this.publishEvent(new RefreshEvent());
   };
 
   public onShowAddLibraryPanelDrawer(panelToReplaceRef?: SceneObjectRef<VizPanel>) {

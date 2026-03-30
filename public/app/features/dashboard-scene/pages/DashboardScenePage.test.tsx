@@ -396,6 +396,24 @@ describe('DashboardScenePage', () => {
       expect(await screen.findByText('Content B')).toBeInTheDocument();
     });
 
+    it('should mark the loaded scene as a home dashboard', async () => {
+      (useParams as jest.Mock).mockReturnValue({});
+      setup({
+        routeProps: {
+          route: {
+            ...getRouteComponentProps().route,
+            routeName: DashboardRoutes.Home,
+          },
+        },
+      });
+
+      await waitForDashboardToRender();
+
+      const dashboard = getDashboardScenePageStateManager().state.dashboard!;
+
+      expect(dashboard.state.isHomeDashboard).toBe(true);
+    });
+
     it('should show controls', async () => {
       getDashboardScenePageStateManager().clearDashboardCache();
       loadDashboardMock.mockClear();
