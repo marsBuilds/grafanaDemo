@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 
 import { PreferencesSpec as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
-import { ThemeRegistryItem } from '@grafana/data';
+import { SelectableValue, ThemeRegistryItem } from '@grafana/data';
 import { LANGUAGES, PSEUDO_LOCALE, t } from '@grafana/i18n';
 import { ComboboxOption } from '@grafana/ui';
 import { LOCALES } from 'app/core/internationalization/locales';
@@ -17,6 +17,8 @@ export type State = UserPreferencesDTO & {
   isLoading: boolean;
   isSubmitting: boolean;
 };
+
+export const BLUE_THEME_ID = 'sapphiredusk';
 
 export const compareStrings = (() => {
   let collator: Intl.Collator | undefined;
@@ -87,6 +89,8 @@ export const getTranslatedThemeName = (theme: ThemeRegistryItem) => {
       return t('shared.preferences.theme.dark-label', 'Dark');
     case 'light':
       return t('shared.preferences.theme.light-label', 'Light');
+    case BLUE_THEME_ID:
+      return t('shared.preferences.theme.blue-label', 'Blue');
     case 'system':
       return t('shared.preferences.theme.system-label', 'System preference');
     default:
@@ -94,10 +98,41 @@ export const getTranslatedThemeName = (theme: ThemeRegistryItem) => {
   }
 };
 
+export const getThemeOptions = (themes: ThemeRegistryItem[], includeBlueThemeSwitch = false): ComboboxOption[] => {
+  const options: ComboboxOption[] = themes.map((theme) => ({
+    value: theme.id,
+    label: getTranslatedThemeName(theme),
+    group: theme.isExtra ? t('shared-preferences.theme.experimental', 'Experimental') : undefined,
+  }));
+
+  if (includeBlueThemeSwitch && !options.some((option) => option.value === BLUE_THEME_ID)) {
+    options.push({
+      value: BLUE_THEME_ID,
+      label: t('shared.preferences.theme.blue-label', 'Blue'),
+      group: t('shared-preferences.theme.experimental', 'Experimental'),
+    });
+  }
+
+  options.unshift({ value: '', label: t('shared-preferences.theme.default-label', 'Default') });
+
+  return options;
+};
+
+export const getQuickThemeOptions = (): Array<SelectableValue<string>> => [
+  { value: 'light', label: t('shared.preferences.theme.light-label', 'Light') },
+  { value: 'dark', label: t('shared.preferences.theme.dark-label', 'Dark') },
+  { value: BLUE_THEME_ID, label: t('shared.preferences.theme.blue-label', 'Blue') },
+];
+
 export const getStyles = () => {
   return {
     labelText: css({
       marginRight: '6px',
+    }),
+    themeControls: css({
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '8px',
     }),
     form: css({
       width: '100%',

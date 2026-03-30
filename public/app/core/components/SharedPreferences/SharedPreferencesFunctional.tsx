@@ -15,6 +15,7 @@ import {
   FieldSet,
   isWeekStart,
   Label,
+  RadioButtonGroup,
   Stack,
   TextLink,
   TimeZonePicker,
@@ -28,7 +29,15 @@ import { changeTheme } from 'app/core/services/theme';
 import { DashboardPicker } from '../Select/DashboardPicker';
 import { getSelectableThemes } from '../ThemeSelector/getSelectableThemes';
 
-import { getLanguageOptions, getRegionalFormatOptions, getStyles, getTranslatedThemeName, Props, State } from './utils';
+import {
+  getLanguageOptions,
+  getQuickThemeOptions,
+  getRegionalFormatOptions,
+  getStyles,
+  getThemeOptions,
+  Props,
+  State,
+} from './utils';
 
 export const SharedPreferencesFunctional = memo((props: Props) => {
   const [state, setState] = useState<UserPreferencesDTO & State>({
@@ -51,16 +60,10 @@ export const SharedPreferencesFunctional = memo((props: Props) => {
 
   // Options are translated, so must be called after init but call them
   // in constructor to avoid memo-break of array changing every render
-  const themeOptions: ComboboxOption[] = themes.map((theme) => ({
-    value: theme.id,
-    label: getTranslatedThemeName(theme),
-    group: theme.isExtra ? t('shared-preferences.theme.experimental', 'Experimental') : undefined,
-  }));
+  const themeOptions: ComboboxOption[] = getThemeOptions(themes, props.preferenceType === 'user');
+  const quickThemeOptions = getQuickThemeOptions();
   const languageOptions: ComboboxOption[] = getLanguageOptions();
   const regionalFormatOptions: ComboboxOption[] = getRegionalFormatOptions();
-
-  // Add default option
-  themeOptions.unshift({ value: '', label: t('shared-preferences.theme.default-label', 'Default') });
 
   useEffect(() => {
     const loadPreferences = async () => {
@@ -165,6 +168,21 @@ export const SharedPreferencesFunctional = memo((props: Props) => {
     <form onSubmit={handleSubmitForm} className={styles.form}>
       <FieldSet label={<Trans i18nKey="shared-preferences.title">Preferences</Trans>} disabled={props.disabled}>
         <Stack direction="column" gap={2}>
+          {props.preferenceType === 'user' && (
+            <Field
+              noMargin
+              loading={state.isLoading}
+              disabled={state.isLoading}
+              label={t('shared-preferences.fields.theme-quick-switcher-label', 'Quick theme switcher')}
+            >
+              <RadioButtonGroup
+                options={quickThemeOptions}
+                value={state.theme}
+                onChange={(value) => handleThemeChanged({ value })}
+                aria-label={t('shared-preferences.fields.theme-quick-switcher-label', 'Quick theme switcher')}
+              />
+            </Field>
+          )}
           <Field
             noMargin
             loading={state.isLoading}
