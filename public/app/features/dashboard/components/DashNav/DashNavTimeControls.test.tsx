@@ -83,12 +83,19 @@ describe('DashNavTimeControls', () => {
 
   it('clicking Sync triggers the same refresh path as the refresh picker', async () => {
     dashboardModel.meta.isHomeDashboard = true;
-    const refreshSpy = jest.spyOn(DashNavTimeControls.prototype as unknown as { onRefreshClick: () => void }, 'onRefreshClick');
+    const onToolbarRefreshClick = jest.fn();
 
-    render(<DashNavTimeControls dashboard={dashboardModel} onChangeTimeZone={jest.fn()} key="time-controls" />);
+    render(
+      <DashNavTimeControls
+        dashboard={dashboardModel}
+        onChangeTimeZone={jest.fn()}
+        onToolbarRefreshClick={onToolbarRefreshClick}
+        key="time-controls"
+      />
+    );
 
     await userEvent.click(screen.getByRole('button', { name: 'Sync' }));
 
-    expect(refreshSpy).toHaveBeenCalledTimes(1);
+    expect(onToolbarRefreshClick).toHaveBeenCalledTimes(1);
   });
 });
