@@ -1,19 +1,26 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { of } from 'rxjs';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import { TestProvider } from 'test/helpers/TestProvider';
 
 import { selectors } from '@grafana/e2e-selectors';
-import { locationService } from '@grafana/runtime';
 
 import { createFetchResponse } from '../../../test/helpers/createFetchResponse';
 import { backendSrv } from '../../core/services/backend_srv';
 
 import { PlaylistNewPage } from './PlaylistNewPage';
 
+const mockNavigate = jest.fn();
+
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
   getBackendSrv: () => backendSrv,
+}));
+
+jest.mock('react-router-dom-v5-compat', () => ({
+  ...jest.requireActual('react-router-dom-v5-compat'),
+  useNavigate: jest.fn(),
 }));
 
 jest.mock('app/core/components/TagFilter/TagFilter', () => ({
@@ -24,6 +31,7 @@ jest.mock('app/core/components/TagFilter/TagFilter', () => ({
 
 function getTestContext() {
   jest.clearAllMocks();
+  (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
 
   // Create separate spies for different HTTP methods
   const postSpy = jest.fn();
@@ -63,8 +71,6 @@ describe('PlaylistNewPage', () => {
     it('then correct api should be called', async () => {
       const { postSpy } = getTestContext();
 
-      expect(locationService.getLocation().pathname).toEqual('/');
-
       await userEvent.type(screen.getByRole('textbox', { name: selectors.pages.PlaylistForm.name }), 'A new name');
       fireEvent.submit(screen.getByRole('button', { name: /save/i }));
       await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(1));
@@ -81,9 +87,7 @@ describe('PlaylistNewPage', () => {
           }),
         })
       );
-      await waitFor(() => {
-        expect(locationService.getLocation().pathname).toEqual('/playlists');
-      });
+      await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/playlists'));
     });
   });
 });
