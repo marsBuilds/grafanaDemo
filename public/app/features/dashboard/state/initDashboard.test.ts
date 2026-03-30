@@ -304,16 +304,23 @@ describeInitScenario('Initializing default home dashboard metadata', (ctx) => {
     ctx.args.routeName = DashboardRoutes.Home;
     ctx.backendSrv.get.mockResolvedValue({
       dashboard: {
-        ...ctx.dashboard,
+        title: 'My cool dashboard',
+        uid: DASH_UID,
+        panels: [],
+        templating: { list: [] },
       },
       meta: {
-        ...ctx.dashboard.meta,
+        canStar: false,
+        canShare: false,
+        canSave: false,
+        folderId: 0,
       },
     });
   });
 
   it('Should mark the dashboard as the home dashboard', () => {
-    expect(ctx.dashboard.meta.isHomeDashboard).toBe(true);
+    const dashboard = ctx.actions[7].payload;
+    expect(dashboard.meta.isHomeDashboard).toBe(true);
   });
 });
 
