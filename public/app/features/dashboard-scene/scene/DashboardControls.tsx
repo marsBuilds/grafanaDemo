@@ -283,6 +283,7 @@ function HomeSyncButton({ dashboard }: { dashboard: DashboardScene }) {
     <ToolbarButton
       variant="secondary"
       icon="sync"
+      aria-label="Sync"
       onClick={() => dashboard.publishEvent(new RefreshEvent())}
       data-testid="data-testid Home dashboard sync button"
     >

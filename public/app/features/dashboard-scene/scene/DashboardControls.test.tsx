@@ -401,7 +401,7 @@ function buildTestSceneWithEditable(options: {
 }
 
 function buildTestScene(state?: Partial<DashboardControlsState>): DashboardControls {
-  return buildTestDashboard().controls;
+  return buildTestDashboard({ controlsState: state }).controls;
 }
 
 function buildTestDashboard({
