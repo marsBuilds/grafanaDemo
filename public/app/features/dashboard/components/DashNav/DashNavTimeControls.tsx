@@ -2,9 +2,9 @@ import { Component } from 'react';
 import { Unsubscribable } from 'rxjs';
 
 import { dateMath, TimeRange, TimeZone } from '@grafana/data';
-import { t } from '@grafana/i18n';
-import { TimeRangeUpdatedEvent } from '@grafana/runtime';
-import { defaultIntervals, isWeekStart, RefreshPicker } from '@grafana/ui';
+import { Trans, t } from '@grafana/i18n';
+import { RefreshEvent, TimeRangeUpdatedEvent } from '@grafana/runtime';
+import { defaultIntervals, isWeekStart, RefreshPicker, ToolbarButton } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { TimePickerWithHistory } from 'app/core/components/TimePicker/TimePickerWithHistory';
 import { AutoRefreshInterval } from 'app/core/services/context_srv';
@@ -95,6 +95,7 @@ export class DashNavTimeControls extends Component<Props> {
     const { dashboard, isOnCanvas } = this.props;
     const { quick_ranges, refresh_intervals } = dashboard.timepicker;
     const intervals = getTimeSrv().getValidIntervals(refresh_intervals || defaultIntervals);
+    const showHomeSyncButton = Boolean(dashboard.meta.isHomeDashboard);
 
     const timePickerValue = getTimeSrv().timeRange();
     const timeZone = dashboard.getTimezone();
@@ -124,6 +125,17 @@ export class DashNavTimeControls extends Component<Props> {
           weekStart={isWeekStart(weekStart) ? weekStart : undefined}
           quickRanges={quick_ranges}
         />
+        {showHomeSyncButton && (
+          <ToolbarButton
+            variant="secondary"
+            icon="sync"
+            aria-label={t('dashboard.controls.home-sync.aria-label', 'Sync')}
+            onClick={this.onRefreshClick}
+            data-testid="data-testid Home dashboard sync button"
+          >
+            <Trans i18nKey="dashboard.controls.home-sync">Sync</Trans>
+          </ToolbarButton>
+        )}
         <RefreshPicker
           onIntervalChanged={this.onChangeRefreshInterval}
           onRefresh={this.onRefreshClick}

@@ -83,6 +83,7 @@ async function fetchDashboard(
         dashDTO.meta.canSave = false;
         dashDTO.meta.canShare = false;
         dashDTO.meta.canStar = false;
+        dashDTO.meta.isHomeDashboard = true;
         return dashDTO;
       }
       case DashboardRoutes.Public: {

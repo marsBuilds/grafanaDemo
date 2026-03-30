@@ -299,6 +299,24 @@ describeInitScenario('Initializing home dashboard', (ctx) => {
   });
 });
 
+describeInitScenario('Initializing default home dashboard metadata', (ctx) => {
+  ctx.setup(() => {
+    ctx.args.routeName = DashboardRoutes.Home;
+    ctx.backendSrv.get.mockResolvedValue({
+      dashboard: {
+        ...ctx.dashboard,
+      },
+      meta: {
+        ...ctx.dashboard.meta,
+      },
+    });
+  });
+
+  it('Should mark the dashboard as the home dashboard', () => {
+    expect(ctx.dashboard.meta.isHomeDashboard).toBe(true);
+  });
+});
+
 describeInitScenario('Initializing home dashboard with query params', (ctx) => {
   ctx.setup(() => {
     // Set initial location with query params

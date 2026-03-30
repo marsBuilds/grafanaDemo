@@ -91,6 +91,7 @@ export interface DashboardMeta {
     failed: boolean;
     error?: string;
   };
+  isHomeDashboard?: boolean;
 }
 
 export interface AnnotationActions {
