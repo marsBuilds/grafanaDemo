@@ -10,6 +10,7 @@ import {
   Field,
   FieldSet,
   Label,
+  RadioButtonGroup,
   TimeZonePicker,
   WeekStartPicker,
   FeatureBadge,
@@ -25,7 +26,15 @@ import { changeTheme } from 'app/core/services/theme';
 
 import { getSelectableThemes } from '../ThemeSelector/getSelectableThemes';
 
-import { getLanguageOptions, getRegionalFormatOptions, getStyles, getTranslatedThemeName, Props, State } from './utils';
+import {
+  getLanguageOptions,
+  getQuickThemeOptions,
+  getRegionalFormatOptions,
+  getStyles,
+  getThemeOptions,
+  Props,
+  State,
+} from './utils';
 
 export class SharedPreferences extends PureComponent<Props, State> {
   service: PreferencesService;
@@ -53,16 +62,9 @@ export class SharedPreferences extends PureComponent<Props, State> {
 
     // Options are translated, so must be called after init but call them
     // in constructor to avoid memo-break of array changing every render
-    this.themeOptions = themes.map((theme) => ({
-      value: theme.id,
-      label: getTranslatedThemeName(theme),
-      group: theme.isExtra ? t('shared-preferences.theme.experimental', 'Experimental') : undefined,
-    }));
+    this.themeOptions = getThemeOptions(themes, props.preferenceType === 'user');
     this.languageOptions = getLanguageOptions();
     this.regionalFormatOptions = getRegionalFormatOptions();
-
-    // Add default option
-    this.themeOptions.unshift({ value: '', label: t('shared-preferences.theme.default-label', 'Default') });
   }
 
   async componentDidMount() {
@@ -170,8 +172,17 @@ export class SharedPreferences extends PureComponent<Props, State> {
     return (
       <form onSubmit={this.onSubmitForm} className={styles.form}>
         <FieldSet label={<Trans i18nKey="shared-preferences.title">Preferences</Trans>} disabled={disabled}>
+          {this.props.preferenceType === 'user' && (
+            <Field disabled={isLoading} label={t('shared-preferences.fields.theme-quick-switcher-label', 'Quick theme switcher')}>
+              <RadioButtonGroup
+                options={getQuickThemeOptions()}
+                value={theme}
+                onChange={(value) => this.onThemeChanged({ value })}
+                aria-label={t('shared-preferences.fields.theme-quick-switcher-label', 'Quick theme switcher')}
+              />
+            </Field>
+          )}
           <Field
-            loading={isLoading}
             disabled={isLoading}
             label={t('shared-preferences.fields.theme-label', 'Interface theme')}
             description={
@@ -198,7 +209,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
           </Field>
 
           <Field
-            loading={isLoading}
             disabled={isLoading}
             label={
               <Label htmlFor="home-dashboard-select">
@@ -220,7 +230,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
           </Field>
 
           <Field
-            loading={isLoading}
             disabled={isLoading}
             label={t('shared-dashboard.fields.timezone-label', 'Timezone')}
             data-testid={selectors.components.TimeZonePicker.containerV2}
@@ -234,7 +243,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
           </Field>
 
           <Field
-            loading={isLoading}
             disabled={isLoading}
             label={t('shared-preferences.fields.week-start-label', 'Week start')}
             data-testid={selectors.components.WeekStartPicker.containerV2}
@@ -247,7 +255,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
           </Field>
 
           <Field
-            loading={isLoading}
             disabled={isLoading}
             label={
               <Label htmlFor="language-preference-select">
@@ -269,7 +276,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
           </Field>
           {config.featureToggles.localeFormatPreference && (
             <Field
-              loading={isLoading}
               disabled={isLoading}
               label={
                 <Label htmlFor="locale-preference">

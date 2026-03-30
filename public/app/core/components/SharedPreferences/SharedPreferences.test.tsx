@@ -9,6 +9,7 @@ import { backendSrv } from 'app/core/services/backend_srv';
 import { captureRequests } from 'app/features/alerting/unified/mocks/server/events';
 
 import { SharedPreferences } from './SharedPreferences';
+import { BLUE_THEME_ID } from './utils';
 
 setBackendSrv(backendSrv);
 setupMockServer();
@@ -61,6 +62,11 @@ describe('SharedPreferences', () => {
     await setup();
     const themeSelect = await screen.findByRole('combobox', { name: 'Interface theme' });
     await waitFor(() => expect(themeSelect).toHaveValue('Light'));
+  });
+
+  it('renders the blue quick theme switcher for user preferences', async () => {
+    await setup();
+    expect(screen.getByRole('radio', { name: 'Blue' })).toBeInTheDocument();
   });
 
   it('renders the home dashboard preference', async () => {
@@ -135,6 +141,28 @@ describe('SharedPreferences', () => {
         homeTab: '',
       },
       language: 'fr-FR',
+    });
+  });
+
+  it('saves the blue quick theme selection using the blue theme id', async () => {
+    const capture = captureRequests();
+    const { user } = await setup();
+
+    await user.click(screen.getByRole('radio', { name: 'Blue' }));
+    await user.click(screen.getByText('Save preferences'));
+
+    const requests = await capture;
+    const newPreferences = await getPrefsUpdateRequest(requests);
+
+    expect(newPreferences).toEqual({
+      timezone: 'browser',
+      weekStart: 'monday',
+      theme: BLUE_THEME_ID,
+      homeDashboardUID: dashbdD.item.uid,
+      queryHistory: {
+        homeTab: '',
+      },
+      language: '',
     });
   });
 
