@@ -4,12 +4,18 @@ import { of } from 'rxjs';
 import { TestProvider } from 'test/helpers/TestProvider';
 
 import { selectors } from '@grafana/e2e-selectors';
-import { locationService } from '@grafana/runtime';
+import { config, locationService } from '@grafana/runtime';
 
 import { createFetchResponse } from '../../../test/helpers/createFetchResponse';
 import { backendSrv } from '../../core/services/backend_srv';
 
 import { PlaylistNewPage } from './PlaylistNewPage';
+
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom-v5-compat', () => ({
+  ...jest.requireActual('react-router-dom-v5-compat'),
+  useNavigate: () => mockNavigate,
+}));
 
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
@@ -24,8 +30,8 @@ jest.mock('app/core/components/TagFilter/TagFilter', () => ({
 
 function getTestContext() {
   jest.clearAllMocks();
+  mockNavigate.mockClear();
 
-  // Create separate spies for different HTTP methods
   const postSpy = jest.fn();
   const otherSpy = jest.fn();
 
@@ -34,7 +40,6 @@ function getTestContext() {
       postSpy(options);
       return of(createFetchResponse({}));
     }
-    // Handle GET and other methods
     otherSpy(options);
     return of(createFetchResponse({ items: [] }));
   });
@@ -50,7 +55,21 @@ function getTestContext() {
   return { rerender, backendSrvMock, postSpy, otherSpy };
 }
 
+async function submitPlaylistForm(postSpy: jest.Mock) {
+  await userEvent.type(screen.getByRole('textbox', { name: selectors.pages.PlaylistForm.name }), 'A new name');
+  fireEvent.submit(screen.getByRole('button', { name: /save/i }));
+  await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(1));
+}
+
 describe('PlaylistNewPage', () => {
+  beforeEach(() => {
+    config.featureToggles.playlistUseNavigate = false;
+  });
+
+  afterEach(() => {
+    config.featureToggles.playlistUseNavigate = false;
+  });
+
   describe('when mounted', () => {
     it('then header should be correct', async () => {
       getTestContext();
@@ -65,9 +84,7 @@ describe('PlaylistNewPage', () => {
 
       expect(locationService.getLocation().pathname).toEqual('/');
 
-      await userEvent.type(screen.getByRole('textbox', { name: selectors.pages.PlaylistForm.name }), 'A new name');
-      fireEvent.submit(screen.getByRole('button', { name: /save/i }));
-      await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(1));
+      await submitPlaylistForm(postSpy);
 
       expect(postSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -83,6 +100,35 @@ describe('PlaylistNewPage', () => {
       );
       await waitFor(() => {
         expect(locationService.getLocation().pathname).toEqual('/playlists');
+      });
+    });
+
+    describe('when feature flag is disabled', () => {
+      it('should use locationService.push', async () => {
+        const { postSpy } = getTestContext();
+
+        await submitPlaylistForm(postSpy);
+
+        await waitFor(() => {
+          expect(locationService.getLocation().pathname).toEqual('/playlists');
+        });
+        expect(mockNavigate).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when feature flag is enabled', () => {
+      beforeEach(() => {
+        config.featureToggles.playlistUseNavigate = true;
+      });
+
+      it('should use navigate', async () => {
+        const { postSpy } = getTestContext();
+
+        await submitPlaylistForm(postSpy);
+
+        await waitFor(() => {
+          expect(mockNavigate).toHaveBeenCalledWith('/playlists');
+        });
       });
     });
   });
