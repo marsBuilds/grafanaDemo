@@ -840,6 +840,11 @@ export interface FeatureToggles {
   */
   playlistsReconciler?: boolean;
   /**
+  * Use React Router's useNavigate hook instead of locationService in playlist pages
+  * @default false
+  */
+  playlistUseNavigate?: boolean;
+  /**
   * Enable passwordless login via magic link authentication
   * @default false
   */
