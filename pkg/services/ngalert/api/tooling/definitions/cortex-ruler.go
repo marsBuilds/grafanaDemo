@@ -614,6 +614,8 @@ type PostableGrafanaRule struct {
 	// required: false
 	// example: 3
 	MissingSeriesEvalsToResolve *int64 `json:"missing_series_evals_to_resolve,omitempty" yaml:"missing_series_evals_to_resolve,omitempty"`
+	// Optional description of this change; stored on the rule and in version history (max 500 characters).
+	Message *string `json:"message,omitempty" yaml:"message,omitempty"`
 }
 
 // swagger:model
@@ -638,7 +640,7 @@ type GettableGrafanaRule struct {
 	GUID                        string                         `json:"guid" yaml:"guid"`
 	MissingSeriesEvalsToResolve *int64                         `json:"missing_series_evals_to_resolve,omitempty" yaml:"missing_series_evals_to_resolve,omitempty"`
 
-	// Field is only populated when listing alert rule versions.
+	// Latest change description on the rule; also set per version when listing alert rule versions.
 	Message string `yaml:"message,omitempty" json:"message,omitempty"`
 }
 

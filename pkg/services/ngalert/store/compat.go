@@ -65,6 +65,7 @@ func convertAlertRuleToModel(ar alertRule, l log.Logger, opts AlertRuleConvertOp
 		KeepFiringFor:               ar.KeepFiringFor,
 		IsPaused:                    ar.IsPaused,
 		MissingSeriesEvalsToResolve: ar.MissingSeriesEvalsToResolve,
+		ChangeMessage:               ar.ChangeMessage,
 	}
 
 	if ar.RuleGroup == "" {
@@ -186,6 +187,7 @@ func alertRuleFromModelsAlertRule(ar models.AlertRule) (alertRule, error) {
 		KeepFiringFor:               ar.KeepFiringFor,
 		IsPaused:                    ar.IsPaused,
 		MissingSeriesEvalsToResolve: ar.MissingSeriesEvalsToResolve,
+		ChangeMessage:               ar.ChangeMessage,
 	}
 
 	if models.IsNoGroupRuleGroup(ar.RuleGroup) {
@@ -264,7 +266,7 @@ func alertRuleToAlertRuleVersion(rule alertRule) alertRuleVersion {
 		Version:                     rule.Version,
 		Created:                     rule.Updated, // assuming the Updated time as the creation time
 		CreatedBy:                   rule.UpdatedBy,
-		Message:                     "", // Message is set by caller when creating versions
+		Message:                     rule.ChangeMessage,
 		Title:                       rule.Title,
 		Condition:                   rule.Condition,
 		Data:                        rule.Data,
@@ -316,6 +318,7 @@ func alertRuleVersionToAlertRule(version alertRuleVersion) alertRule {
 		AlertRoutingPolicy:          version.AlertRoutingPolicy,
 		Metadata:                    version.Metadata,
 		MissingSeriesEvalsToResolve: version.MissingSeriesEvalsToResolve,
+		ChangeMessage:               version.Message,
 	}
 }
 

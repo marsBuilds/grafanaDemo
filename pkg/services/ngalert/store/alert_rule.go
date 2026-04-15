@@ -523,10 +523,15 @@ func (st DBstore) InsertAlertRules(ctx context.Context, user *ngmodels.UserUID, 
 			// assign unique identifier that will identify resource across space and time. The probability of collision is so low that we do not need to check for uniqueness.
 			// The unique keys will ensure uniqueness in rule and versions tables
 			converted.GUID = uuid.NewString()
+			changeMsg := r.Message
+			if changeMsg == "" {
+				changeMsg = r.AlertRule.ChangeMessage
+			}
+			converted.ChangeMessage = changeMsg
 
 			newRules = append(newRules, converted)
 			v := alertRuleToAlertRuleVersion(converted)
-			v.Message = r.Message
+			v.Message = changeMsg
 			ruleVersions = append(ruleVersions, v)
 		}
 		if len(newRules) > 0 {
@@ -604,6 +609,13 @@ func (st DBstore) UpdateAlertRules(ctx context.Context, user *ngmodels.UserUID, 
 			converted, err := alertRuleFromModelsAlertRule(r.New)
 			if err != nil {
 				return fmt.Errorf("failed to convert alert rule %s to storage model: %w", r.New.UID, err)
+			}
+			if r.Message != "" {
+				converted.ChangeMessage = r.Message
+			} else if r.New.ChangeMessage != "" {
+				converted.ChangeMessage = r.New.ChangeMessage
+			} else {
+				converted.ChangeMessage = r.Existing.ChangeMessage
 			}
 			// no way to update multiple rules at once
 			if updated, err := sess.ID(r.Existing.ID).AllCols().Omit("rule_guid").Update(converted); err != nil || updated == 0 {

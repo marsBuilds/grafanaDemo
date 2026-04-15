@@ -33,6 +33,7 @@ type alertRule struct {
 	AlertRoutingPolicy          *string `xorm:"alert_routing_policy"`
 	Metadata                    string  `xorm:"metadata"`
 	MissingSeriesEvalsToResolve *int64  `xorm:"missing_series_evals_to_resolve"`
+	ChangeMessage               string  `xorm:"change_message"`
 }
 
 func (a alertRule) TableName() string {
@@ -76,7 +77,7 @@ type alertRuleVersion struct {
 }
 
 // EqualSpec compares two alertRuleVersion objects for equality based on their specifications and returns true if they match.
-// The comparison is very basic and can produce false-negative. Fields excluded: ID, ParentVersion, RestoredFrom, Version, Created, RuleGroupIndex, CreatedBy and Message
+// The comparison is very basic and can produce false-negative. Fields excluded: ID, ParentVersion, RestoredFrom, Version, Created, RuleGroupIndex, CreatedBy
 func (a alertRuleVersion) EqualSpec(b alertRuleVersion) bool {
 	return a.RuleOrgID == b.RuleOrgID &&
 		a.RuleGUID == b.RuleGUID &&
@@ -98,7 +99,8 @@ func (a alertRuleVersion) EqualSpec(b alertRuleVersion) bool {
 		a.NotificationSettings == b.NotificationSettings &&
 		a.Metadata == b.Metadata &&
 		compareInt64Pointer(a.MissingSeriesEvalsToResolve, b.MissingSeriesEvalsToResolve) &&
-		compareStringPointer(a.AlertRoutingPolicy, b.AlertRoutingPolicy)
+		compareStringPointer(a.AlertRoutingPolicy, b.AlertRoutingPolicy) &&
+		a.Message == b.Message
 }
 
 func compareInt64Pointer(a, b *int64) bool {

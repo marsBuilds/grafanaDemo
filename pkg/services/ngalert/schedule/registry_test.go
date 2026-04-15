@@ -152,7 +152,7 @@ func TestRuleWithFolderFingerprint(t *testing.T) {
 		f2 := ruleWithFolder{rule: rule, folderTitle: uuid.NewString()}.Fingerprint()
 		require.NotEqual(t, f, f2)
 	})
-	t.Run("Version, Updated, IntervalSeconds, GUID, Annotations and RuleGroupIndex should be excluded from fingerprint", func(t *testing.T) {
+	t.Run("Version, Updated, IntervalSeconds, GUID, Annotations, RuleGroupIndex and ChangeMessage should be excluded from fingerprint", func(t *testing.T) {
 		cp := models.CopyRule(rule)
 		cp.Version++
 		cp.Updated = cp.Updated.Add(1 * time.Second)
@@ -161,6 +161,7 @@ func TestRuleWithFolderFingerprint(t *testing.T) {
 		cp.Annotations["test"] = "test"
 		cp.RuleGroupIndex++
 		cp.GUID = uuid.NewString()
+		cp.ChangeMessage = "note that must not affect scheduling fingerprint"
 
 		f2 := ruleWithFolder{rule: cp, folderTitle: title}.Fingerprint()
 		require.Equal(t, f, f2)
@@ -269,6 +270,7 @@ func TestRuleWithFolderFingerprint(t *testing.T) {
 			"OrgID":           {},
 			"GUID":            {},
 			"FolderFullpath":  {}, // Populated lazily from DB, not part of rule fingerprint
+			"ChangeMessage":   {}, // Version metadata; not part of rule fingerprint
 		}
 
 		tp := reflect.TypeOf(rule).Elem()

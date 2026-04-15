@@ -139,6 +139,7 @@ func (g *AlertRuleGenerator) Generate() AlertRule {
 		NotificationSettings:        ns,
 		Metadata:                    GenerateMetadata(),
 		MissingSeriesEvalsToResolve: util.Pointer[int64](2),
+		ChangeMessage:               fmt.Sprintf("change-msg-%s", util.GenerateShortUID()),
 	}
 
 	for _, mutator := range g.mutators {

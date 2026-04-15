@@ -580,6 +580,7 @@ func (srv RulerSrv) performUpdateAlertRules(ctx context.Context, c *contextmodel
 				updates = append(updates, ngmodels.UpdateRule{
 					Existing: update.Existing,
 					New:      *update.New,
+					Message:  update.New.ChangeMessage,
 				})
 			}
 			err = srv.store.UpdateAlertRules(tranCtx, ngmodels.NewUserUID(c.SignedInUser), updates)
@@ -591,7 +592,10 @@ func (srv RulerSrv) performUpdateAlertRules(ctx context.Context, c *contextmodel
 		if len(finalChanges.New) > 0 {
 			inserts := make([]ngmodels.InsertRule, 0, len(finalChanges.New))
 			for _, rule := range finalChanges.New {
-				inserts = append(inserts, ngmodels.InsertRule{AlertRule: *rule})
+				inserts = append(inserts, ngmodels.InsertRule{
+					AlertRule: *rule,
+					Message:   rule.ChangeMessage,
+				})
 			}
 			added, err := srv.store.InsertAlertRules(tranCtx, ngmodels.NewUserUID(c.SignedInUser), inserts)
 			if err != nil {
@@ -697,6 +701,7 @@ func toGettableExtendedRuleNode(r ngmodels.AlertRule, provenanceRecords map[stri
 			Metadata:                    AlertRuleMetadataFromModelMetadata(r.Metadata),
 			GUID:                        r.GUID,
 			MissingSeriesEvalsToResolve: r.MissingSeriesEvalsToResolve,
+			Message:                     r.ChangeMessage,
 		},
 	}
 	forDuration := model.Duration(r.For)

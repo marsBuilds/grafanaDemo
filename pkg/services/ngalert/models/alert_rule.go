@@ -374,6 +374,9 @@ type AlertRule struct {
 	// If nil, alerts resolve after 2 missing evaluation intervals
 	// (i.e., resolution occurs during the second evaluation where data is absent).
 	MissingSeriesEvalsToResolve *int64
+	// ChangeMessage is the latest user-provided description of a rule change; persisted on alert_rule.
+	// Historical messages are stored per row in alert_rule_version (see AlertRuleVersion.Message).
+	ChangeMessage string
 }
 
 type AlertRuleVersion struct {
@@ -456,6 +459,7 @@ type AlertRuleWithOptionals struct {
 	// DB in case it was not sent.
 	HasPause          bool
 	HasEditorSettings bool
+	HasChangeMessage  bool
 }
 
 // AlertsRulesBy is a function that defines the ordering of alert rules.
@@ -914,6 +918,7 @@ func (alertRule *AlertRule) Copy() *AlertRule {
 		Metadata:                    alertRule.Metadata,
 		KeepFiringFor:               alertRule.KeepFiringFor,
 		MissingSeriesEvalsToResolve: alertRule.MissingSeriesEvalsToResolve,
+		ChangeMessage:               alertRule.ChangeMessage,
 	}
 
 	if alertRule.DashboardUID != nil {
@@ -1208,6 +1213,9 @@ func PatchPartialAlertRule(existingRule *AlertRule, ruleToPatch *AlertRuleWithOp
 	}
 	if !ruleToPatch.HasEditorSettings {
 		ruleToPatch.Metadata.EditorSettings = existingRule.Metadata.EditorSettings
+	}
+	if !ruleToPatch.HasChangeMessage {
+		ruleToPatch.ChangeMessage = existingRule.ChangeMessage
 	}
 	if ruleToPatch.MissingSeriesEvalsToResolve != nil && *ruleToPatch.MissingSeriesEvalsToResolve == -1 {
 		ruleToPatch.MissingSeriesEvalsToResolve = existingRule.MissingSeriesEvalsToResolve
