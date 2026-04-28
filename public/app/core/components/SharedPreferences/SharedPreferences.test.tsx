@@ -112,7 +112,7 @@ describe('SharedPreferences', () => {
     const capture = captureRequests();
     const { user } = await setup();
 
-    await selectComboboxOptionInTest(await screen.findByRole('combobox', { name: 'Interface theme' }), 'Dark');
+    await selectComboboxOptionInTest(await screen.findByRole('combobox', { name: 'Interface theme' }), 'Orange');
     await selectComboboxOptionInTest(
       await screen.findByRole('combobox', { name: /home dashboard/i }),
       new RegExp(dashboardToSelect.title)
@@ -129,7 +129,7 @@ describe('SharedPreferences', () => {
     expect(newPreferences).toEqual({
       timezone: 'Australia/Sydney',
       weekStart: 'saturday',
-      theme: 'dark',
+      theme: 'orange',
       homeDashboardUID: dashboardToSelect.uid,
       queryHistory: {
         homeTab: '',
