@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 import { TestProvider } from 'test/helpers/TestProvider';
 import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
 
-import { DataFrame, DataFrameView, FieldType } from '@grafana/data';
+import { createTheme, DataFrame, DataFrameView, FieldType } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { HOME_NAV_ID } from 'app/core/reducers/navModel';
 import { getGrafanaSearcher } from 'app/features/search/service/searcher';
@@ -109,5 +109,12 @@ describe('AppChrome', () => {
     waitFor(() => {
       expect(screen.queryByRole('link', { name: 'Skip to main content' })).not.toBeInTheDocument();
     });
+  });
+
+  it('should render the top navigation with a purple background', async () => {
+    setup(<Page navId="child1">Children</Page>);
+    const header = await screen.findByRole('banner');
+    const expectedPurple = createTheme().visualization.getColorByName('purple');
+    expect(header).toHaveStyle({ backgroundColor: expectedPurple });
   });
 });

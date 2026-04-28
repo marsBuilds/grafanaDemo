@@ -119,6 +119,7 @@ const getStyles = (theme: GrafanaTheme2, menuDockedAndOpen: boolean) => ({
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     paddingLeft: menuDockedAndOpen ? theme.spacing(3.5) : theme.spacing(0.75),
+    backgroundColor: theme.visualization.getColorByName('purple'),
     borderBottom: `1px solid ${theme.colors.border.weak}`,
     justifyContent: 'space-between',
   }),
