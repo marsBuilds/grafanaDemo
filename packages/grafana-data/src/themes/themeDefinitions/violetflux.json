@@ -1,0 +1,64 @@
+{
+  "name": "Violet flux",
+  "id": "violetflux",
+  "colors": {
+    "mode": "dark",
+    "border": {
+      "weak": "#3d3359",
+      "medium": "#4f446f",
+      "strong": "#6b5896"
+    },
+    "text": {
+      "primary": "#EDE9FA",
+      "secondary": "#C9BFDD",
+      "disabled": "#8F839F",
+      "link": "#C084FC",
+      "maxContrast": "#FFFFFF"
+    },
+    "primary": {
+      "main": "#A855F7"
+    },
+    "secondary": {
+      "main": "#4f446f",
+      "text": "#DCCFEC",
+      "border": "#6b5896"
+    },
+    "info": {
+      "main": "#7C3AED",
+      "text": "#EDE9FA",
+      "border": "#9333EA"
+    },
+    "error": {
+      "main": "#F472B6"
+    },
+    "success": {
+      "main": "#34D399"
+    },
+    "warning": {
+      "main": "#FBBF24"
+    },
+    "background": {
+      "canvas": "#1a1428",
+      "primary": "#251f37",
+      "secondary": "#2f2748",
+      "elevated": "#362e54"
+    },
+    "action": {
+      "hover": "#4f446f",
+      "selected": "#6b5896",
+      "selectedBorder": "#E879F9",
+      "focus": "#A855F7",
+      "hoverOpacity": 0.08,
+      "disabledText": "#8F839F",
+      "disabledBackground": "#2f2748",
+      "disabledOpacity": 0.38
+    },
+    "gradients": {
+      "brandHorizontal": "linear-gradient(270deg, #6D28D9 0%, #E879F9 100%)",
+      "brandVertical": "linear-gradient(0deg, #6D28D9 0%, #E879F9 100%)"
+    },
+    "contrastThreshold": 4,
+    "hoverFactor": 0.06,
+    "tonalOffset": 0.15
+  }
+}

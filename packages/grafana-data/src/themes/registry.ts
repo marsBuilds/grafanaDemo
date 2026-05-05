@@ -12,6 +12,7 @@ import sapphiredusk from './themeDefinitions/sapphiredusk.json';
 import synthwave from './themeDefinitions/synthwave.json';
 import tron from './themeDefinitions/tron.json';
 import victorian from './themeDefinitions/victorian.json';
+import violetflux from './themeDefinitions/violetflux.json';
 import zen from './themeDefinitions/zen.json';
 import { GrafanaTheme2 } from './types';
 
@@ -32,6 +33,7 @@ const extraThemes: { [key: string]: unknown } = {
   synthwave,
   tron,
   victorian,
+  violetflux,
   zen,
 };
 
