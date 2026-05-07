@@ -26,6 +26,7 @@ import { InviteUserButton } from './InviteUserButton';
 import { ProfileButton } from './ProfileButton';
 import { SignInLink } from './SignInLink';
 import { SingleTopBarActions } from './SingleTopBarActions';
+import { ThemeModeToggle } from './ThemeModeToggle';
 import { TopBarExtensionPoint } from './TopBarExtensionPoint';
 import { TopSearchBarCommandPaletteTrigger } from './TopSearchBarCommandPaletteTrigger';
 import { getChromeHeaderLevelHeight } from './useChromeHeaderHeight';
@@ -101,6 +102,7 @@ export const SingleTopBar = memo(function SingleTopBar({
           {!showToolbarLevel && actions}
           {!contextSrv.user.isSignedIn && <SignInLink />}
           <InviteUserButton />
+          <ThemeModeToggle />
           {profileNode && <ProfileButton profileNode={profileNode} onToggleKioskMode={onToggleKioskMode} />}
         </Stack>
       </div>
