@@ -1,8 +1,10 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,6 +13,7 @@ import (
 	"github.com/grafana/grafana/pkg/infra/db/dbtest"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
 	"github.com/grafana/grafana/pkg/services/anonymous/anontest"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/stats"
 	"github.com/grafana/grafana/pkg/services/stats/statstest"
 	"github.com/grafana/grafana/pkg/setting"
@@ -148,6 +151,26 @@ func TestAdmin_AccessControl(t *testing.T) {
 				},
 			},
 		},
+		{
+			expectedCode: http.StatusOK,
+			desc:         "AdminGetFeatureToggles should return 200 for user with correct permissions",
+			url:          "/api/admin/feature-toggles",
+			permissions: []accesscontrol.Permission{
+				{
+					Action: accesscontrol.ActionFeatureManagementRead,
+				},
+			},
+		},
+		{
+			expectedCode: http.StatusForbidden,
+			desc:         "AdminGetFeatureToggles should return 403 for user without required permissions",
+			url:          "/api/admin/feature-toggles",
+			permissions: []accesscontrol.Permission{
+				{
+					Action: "wrong",
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -170,4 +193,37 @@ func TestAdmin_AccessControl(t *testing.T) {
 			require.NoError(t, res.Body.Close())
 		})
 	}
+}
+
+func TestAPI_AdminUpdateFeatureToggle(t *testing.T) {
+	features := featuremgmt.WithManager("alpha", false, "beta", true)
+	server := SetupAPITestServer(t, func(hs *HTTPServer) {
+		hs.Features = features
+	})
+
+	req := webtest.RequestWithSignedInUser(
+		server.NewRequest(http.MethodPut, "/api/admin/feature-toggles/alpha", strings.NewReader(`{"enabled":true}`)),
+		userWithPermissions(1, []accesscontrol.Permission{{Action: accesscontrol.ActionFeatureManagementWrite}}),
+	)
+	res, err := server.SendJSON(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	var state featuremgmt.FeatureToggleState
+	require.NoError(t, json.NewDecoder(res.Body).Decode(&state))
+	require.NoError(t, res.Body.Close())
+	assert.Equal(t, "alpha", state.Name)
+	assert.True(t, state.Enabled)
+	assert.Equal(t, "runtime", state.Source)
+	assert.True(t, features.IsEnabledGlobally("alpha"))
+
+	req = webtest.RequestWithSignedInUser(
+		server.NewRequest(http.MethodPut, "/api/admin/feature-toggles/beta", strings.NewReader(`{"enabled":false}`)),
+		userWithPermissions(1, []accesscontrol.Permission{{Action: "wrong"}}),
+	)
+	res, err = server.SendJSON(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusForbidden, res.StatusCode)
+	require.NoError(t, res.Body.Close())
+	assert.True(t, features.IsEnabledGlobally("beta"))
 }
