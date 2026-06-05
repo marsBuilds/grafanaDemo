@@ -3444,6 +3444,20 @@
     },
     {
       "metadata": {
+        "name": "playlistUseNavigate",
+        "resourceVersion": "1780662495367",
+        "creationTimestamp": "2026-06-05T12:28:15Z"
+      },
+      "spec": {
+        "description": "Use React Router's useNavigate hook instead of locationService in playlist pages",
+        "stage": "experimental",
+        "codeowner": "@grafana/dashboards-squad",
+        "frontend": true,
+        "expression": "false"
+      }
+    },
+    {
+      "metadata": {
         "name": "playlistsReconciler",
         "resourceVersion": "1771434338561",
         "creationTimestamp": "2024-12-20T03:09:31Z"
