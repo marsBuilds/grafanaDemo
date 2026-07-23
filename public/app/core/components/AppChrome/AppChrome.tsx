@@ -230,7 +230,7 @@ const getStyles = (theme: GrafanaTheme2, headerLevels: number, headerHeight: num
       zIndex: theme.zIndex.navbarFixed,
       left: 0,
       right: 0,
-      background: theme.colors.background.primary,
+      background: theme.visualization.getColorByName('purple'),
       flexDirection: 'column',
     }),
     topNavMenuDocked: css({
