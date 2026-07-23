@@ -152,6 +152,20 @@ type FeatureFlag struct {
 	RequiresRestart bool `json:"requiresRestart,omitempty"`
 }
 
+type FeatureToggleState struct {
+	Name            string           `json:"name"`
+	Description     string           `json:"description"`
+	Stage           FeatureFlagStage `json:"stage"`
+	Enabled         bool             `json:"enabled"`
+	DefaultEnabled  bool             `json:"defaultEnabled"`
+	RequiresRestart bool             `json:"requiresRestart"`
+	RequiresDevMode bool             `json:"requiresDevMode"`
+	Frontend        bool             `json:"frontend"`
+	Writable        bool             `json:"writable"`
+	Source          string           `json:"source"`
+	Warning         string           `json:"warning,omitempty"`
+}
+
 type FeatureToggleWebhookPayload struct {
 	FeatureToggles map[string]string `json:"feature_toggles"`
 	User           string            `json:"user"`
