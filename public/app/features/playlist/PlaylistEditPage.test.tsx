@@ -3,12 +3,19 @@ import userEvent from '@testing-library/user-event';
 import { of } from 'rxjs';
 import { TestProvider } from 'test/helpers/TestProvider';
 
-import { locationService } from '@grafana/runtime';
+import { config, locationService } from '@grafana/runtime';
 import { backendSrv } from 'app/core/services/backend_srv';
 
 import { createFetchResponse } from '../../../test/helpers/createFetchResponse';
 
 import { PlaylistEditPage } from './PlaylistEditPage';
+
+const mockNavigate = jest.fn();
+
+jest.mock('react-router-dom-v5-compat', () => ({
+  ...jest.requireActual('react-router-dom-v5-compat'),
+  useNavigate: () => mockNavigate,
+}));
 
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
@@ -23,6 +30,7 @@ jest.mock('app/core/components/TagFilter/TagFilter', () => ({
 
 async function getTestContext() {
   jest.clearAllMocks();
+  mockNavigate.mockClear();
 
   const backendSrvMock = jest.spyOn(backendSrv, 'fetch').mockImplementation(() =>
     of(
@@ -50,6 +58,14 @@ async function getTestContext() {
 }
 
 describe('PlaylistEditPage', () => {
+  beforeEach(() => {
+    config.featureToggles.playlistUseNavigate = false;
+  });
+
+  afterEach(() => {
+    config.featureToggles.playlistUseNavigate = false;
+  });
+
   describe('when mounted', () => {
     it('then it should load playlist and header should be correct', async () => {
       await getTestContext();
@@ -62,34 +78,72 @@ describe('PlaylistEditPage', () => {
   });
 
   describe('when submitted', () => {
-    it('then correct api should be called', async () => {
-      const { backendSrvMock } = await getTestContext();
+    describe('when feature flag is disabled', () => {
+      it('then correct api should be called and locationService should navigate', async () => {
+        const { backendSrvMock } = await getTestContext();
 
-      expect(await screen.findByRole('heading', { name: /edit playlist/i })).toBeInTheDocument();
-      expect(locationService.getLocation().pathname).toEqual('/');
-      await userEvent.clear(await screen.findByRole('textbox', { name: /playlist name/i }));
-      await userEvent.type(screen.getByRole('textbox', { name: /playlist name/i }), 'A Name');
-      await userEvent.clear(await screen.findByRole('textbox', { name: /playlist interval/i }));
-      await userEvent.type(screen.getByRole('textbox', { name: /playlist interval/i }), '10s');
-      fireEvent.submit(screen.getByRole('button', { name: /save/i }));
-      await waitFor(() =>
-        expect(backendSrvMock).toHaveBeenCalledWith(
-          expect.objectContaining({
-            body: expect.objectContaining({
-              spec: {
-                title: 'A Name',
-                interval: '10s',
-                items: [{ title: 'First item', type: 'dashboard_by_uid', order: 1, value: '1' }],
-              },
-              metadata: {
-                name: 'foo',
-              },
-            }),
-            method: 'PUT',
-          })
-        )
-      );
-      expect(locationService.getLocation().pathname).toEqual('/playlists');
+        expect(await screen.findByRole('heading', { name: /edit playlist/i })).toBeInTheDocument();
+        expect(locationService.getLocation().pathname).toEqual('/');
+        await userEvent.clear(await screen.findByRole('textbox', { name: /playlist name/i }));
+        await userEvent.type(screen.getByRole('textbox', { name: /playlist name/i }), 'A Name');
+        await userEvent.clear(await screen.findByRole('textbox', { name: /playlist interval/i }));
+        await userEvent.type(screen.getByRole('textbox', { name: /playlist interval/i }), '10s');
+        fireEvent.submit(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() =>
+          expect(backendSrvMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              body: expect.objectContaining({
+                spec: {
+                  title: 'A Name',
+                  interval: '10s',
+                  items: [{ title: 'First item', type: 'dashboard_by_uid', order: 1, value: '1' }],
+                },
+                metadata: {
+                  name: 'foo',
+                },
+              }),
+              method: 'PUT',
+            })
+          )
+        );
+        expect(locationService.getLocation().pathname).toEqual('/playlists');
+        expect(mockNavigate).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when feature flag is enabled', () => {
+      beforeEach(() => {
+        config.featureToggles.playlistUseNavigate = true;
+      });
+
+      it('then correct api should be called and navigate should be used', async () => {
+        const { backendSrvMock } = await getTestContext();
+
+        expect(await screen.findByRole('heading', { name: /edit playlist/i })).toBeInTheDocument();
+        await userEvent.clear(await screen.findByRole('textbox', { name: /playlist name/i }));
+        await userEvent.type(screen.getByRole('textbox', { name: /playlist name/i }), 'A Name');
+        await userEvent.clear(await screen.findByRole('textbox', { name: /playlist interval/i }));
+        await userEvent.type(screen.getByRole('textbox', { name: /playlist interval/i }), '10s');
+        fireEvent.submit(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() =>
+          expect(backendSrvMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              body: expect.objectContaining({
+                spec: {
+                  title: 'A Name',
+                  interval: '10s',
+                  items: [{ title: 'First item', type: 'dashboard_by_uid', order: 1, value: '1' }],
+                },
+                metadata: {
+                  name: 'foo',
+                },
+              }),
+              method: 'PUT',
+            })
+          )
+        );
+        expect(mockNavigate).toHaveBeenCalledWith('/playlists');
+      });
     });
   });
 });
