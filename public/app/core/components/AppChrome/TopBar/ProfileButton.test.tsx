@@ -31,6 +31,16 @@ describe('ProfileButton', () => {
 
   afterEach(() => {
     document.body.removeChild(mainView);
+    config.featureToggles.grafanaconThemes = false;
+  });
+
+  it('shows Change theme in the profile menu without grafanaconThemes', async () => {
+    config.featureToggles.grafanaconThemes = false;
+    render(<ProfileButton {...defaultProps} />);
+
+    await user.click(screen.getByRole('button', { name: /profile/i }));
+
+    expect(screen.getByRole('menuitem', { name: /change theme/i })).toBeInTheDocument();
   });
 
   it('should return focus to the profile button when the news feed drawer is closed', async () => {
