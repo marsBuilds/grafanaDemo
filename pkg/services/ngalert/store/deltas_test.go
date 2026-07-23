@@ -80,6 +80,9 @@ func TestCalculateChanges(t *testing.T) {
 		inDatabaseMap := groupByUID(t, inDatabase)
 
 		rules := gen.With(simulateSubmitted, gen.WithGroupKey(groupKey), withUIDs(inDatabaseMap)).GenerateManyRef(len(inDatabase), len(inDatabase))
+		for _, rule := range rules {
+			rule.ChangeMessage = inDatabaseMap[rule.UID].ChangeMessage
+		}
 		submittedMap := groupByUID(t, rules)
 		submitted := make([]*models.AlertRuleWithOptionals, 0, len(rules))
 		for _, rule := range rules {
@@ -221,6 +224,9 @@ func TestCalculateChanges(t *testing.T) {
 		}
 
 		rules := gen.With(simulateSubmitted, gen.WithGroupKey(groupKey), withUIDs(inDatabaseMap)).GenerateManyRef(5, len(inDatabase))
+		for _, rule := range rules {
+			rule.ChangeMessage = inDatabaseMap[rule.UID].ChangeMessage
+		}
 		submittedMap := groupByUID(t, rules)
 		submitted := make([]*models.AlertRuleWithOptionals, 0, len(rules))
 		for _, rule := range rules {

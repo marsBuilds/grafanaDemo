@@ -242,6 +242,12 @@ func TestAlertRuleVersion_EqualSpec(t *testing.T) {
 			}(),
 			expect: true,
 		},
+		{
+			name:   "different Message",
+			a:      baseVersion,
+			b:      func() alertRuleVersion { v := baseVersion; v.Message = "m2"; return v }(),
+			expect: false,
+		},
 	}
 
 	for _, tt := range tests {

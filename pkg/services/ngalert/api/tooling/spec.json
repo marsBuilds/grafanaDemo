@@ -6152,7 +6152,7 @@
           "type": "boolean"
         },
         "message": {
-          "description": "Field is only populated when listing alert rule versions.",
+          "description": "Latest change description on the rule; also set per version when listing alert rule versions.",
           "type": "string"
         },
         "metadata": {
@@ -7551,6 +7551,10 @@
           "type": "integer",
           "format": "int64",
           "example": 3
+        },
+        "message": {
+          "description": "Optional description of this change; stored on the rule and in version history (max 500 characters).",
+          "type": "string"
         },
         "no_data_state": {
           "type": "string",

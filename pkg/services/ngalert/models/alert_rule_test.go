@@ -594,6 +594,13 @@ func TestDiff(t *testing.T) {
 			assert.Equal(t, *rule2.MissingSeriesEvalsToResolve, diff[0].Right.Int())
 			difCnt++
 		}
+		if rule1.ChangeMessage != rule2.ChangeMessage {
+			diff := diffs.GetDiffsForField("ChangeMessage")
+			assert.Len(t, diff, 1)
+			assert.Equal(t, rule1.ChangeMessage, diff[0].Left.String())
+			assert.Equal(t, rule2.ChangeMessage, diff[0].Right.String())
+			difCnt++
+		}
 
 		require.Lenf(t, diffs, difCnt, "Got some unexpected diffs. Either add to ignore or add assert to it")
 

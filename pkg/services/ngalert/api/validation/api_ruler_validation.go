@@ -390,6 +390,14 @@ func ValidateRuleGroup(
 		ruleWithOptionals.AlertRule = *rule
 		ruleWithOptionals.HasPause = hasPause
 		ruleWithOptionals.HasEditorSettings = hasEditorSettings
+		if alert := original.GrafanaManagedAlert; alert != nil && alert.Message != nil {
+			msg := strings.TrimSpace(*alert.Message)
+			if len(msg) > 500 {
+				return nil, fmt.Errorf("invalid rule specification at index [%d]: message must be less than 500 characters", idx)
+			}
+			ruleWithOptionals.ChangeMessage = msg
+			ruleWithOptionals.HasChangeMessage = true
+		}
 
 		result = append(result, &ruleWithOptionals)
 	}
