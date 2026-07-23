@@ -1314,6 +1314,14 @@ var (
 			Expression:      "false",
 		},
 		{
+			Name:         "playlistNewUseNavigate",
+			Description:  "Use React Router's useNavigate hook instead of locationService in the new playlist page",
+			Stage:        FeatureStageExperimental,
+			FrontendOnly: true,
+			Owner:        grafanaDashboardsSquad,
+			Expression:   "false",
+		},
+		{
 			Name:         "passwordlessMagicLinkAuthentication",
 			Description:  "Enable passwordless login via magic link authentication",
 			Stage:        FeatureStageExperimental,

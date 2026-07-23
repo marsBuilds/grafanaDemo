@@ -4,12 +4,18 @@ import { of } from 'rxjs';
 import { TestProvider } from 'test/helpers/TestProvider';
 
 import { selectors } from '@grafana/e2e-selectors';
-import { locationService } from '@grafana/runtime';
+import { config, locationService } from '@grafana/runtime';
 
 import { createFetchResponse } from '../../../test/helpers/createFetchResponse';
 import { backendSrv } from '../../core/services/backend_srv';
 
 import { PlaylistNewPage } from './PlaylistNewPage';
+
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom-v5-compat', () => ({
+  ...jest.requireActual('react-router-dom-v5-compat'),
+  useNavigate: () => mockNavigate,
+}));
 
 jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
@@ -24,6 +30,7 @@ jest.mock('app/core/components/TagFilter/TagFilter', () => ({
 
 function getTestContext() {
   jest.clearAllMocks();
+  mockNavigate.mockClear();
 
   // Create separate spies for different HTTP methods
   const postSpy = jest.fn();
@@ -51,6 +58,10 @@ function getTestContext() {
 }
 
 describe('PlaylistNewPage', () => {
+  afterEach(() => {
+    config.featureToggles.playlistNewUseNavigate = false;
+  });
+
   describe('when mounted', () => {
     it('then header should be correct', async () => {
       getTestContext();
@@ -60,29 +71,62 @@ describe('PlaylistNewPage', () => {
   });
 
   describe('when submitted', () => {
-    it('then correct api should be called', async () => {
-      const { postSpy } = getTestContext();
+    describe('with playlistNewUseNavigate disabled', () => {
+      it('then correct api should be called and location should update', async () => {
+        const { postSpy } = getTestContext();
 
-      expect(locationService.getLocation().pathname).toEqual('/');
+        expect(locationService.getLocation().pathname).toEqual('/');
 
-      await userEvent.type(screen.getByRole('textbox', { name: selectors.pages.PlaylistForm.name }), 'A new name');
-      fireEvent.submit(screen.getByRole('button', { name: /save/i }));
-      await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(1));
+        await userEvent.type(screen.getByRole('textbox', { name: selectors.pages.PlaylistForm.name }), 'A new name');
+        fireEvent.submit(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(1));
 
-      expect(postSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          body: expect.objectContaining({
-            spec: {
-              title: 'A new name',
-              interval: '5m',
-              items: [],
-            },
-          }),
-        })
-      );
-      await waitFor(() => {
-        expect(locationService.getLocation().pathname).toEqual('/playlists');
+        expect(postSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            body: expect.objectContaining({
+              spec: {
+                title: 'A new name',
+                interval: '5m',
+                items: [],
+              },
+            }),
+          })
+        );
+        await waitFor(() => {
+          expect(locationService.getLocation().pathname).toEqual('/playlists');
+        });
+        expect(mockNavigate).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('with playlistNewUseNavigate enabled', () => {
+      beforeEach(() => {
+        config.featureToggles.playlistNewUseNavigate = true;
+      });
+
+      it('then correct api should be called and navigate should be invoked', async () => {
+        const { postSpy } = getTestContext();
+
+        await userEvent.type(screen.getByRole('textbox', { name: selectors.pages.PlaylistForm.name }), 'A new name');
+        fireEvent.submit(screen.getByRole('button', { name: /save/i }));
+        await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(1));
+
+        expect(postSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            body: expect.objectContaining({
+              spec: {
+                title: 'A new name',
+                interval: '5m',
+                items: [],
+              },
+            }),
+          })
+        );
+        await waitFor(() => {
+          expect(mockNavigate).toHaveBeenCalledWith('/playlists');
+        });
       });
     });
   });
