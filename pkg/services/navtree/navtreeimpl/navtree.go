@@ -162,6 +162,17 @@ func (s *ServiceImpl) GetNavTree(c *contextmodel.ReqContext, prefs *pref.Prefere
 		treeRoot.AddSection(connectionsSection)
 	}
 
+	if c.IsSignedIn && c.HasRole(identity.RoleAdmin) {
+		treeRoot.AddSection(&navtree.NavLink{
+			Text:       "Status",
+			Id:         navtree.NavIDStatus,
+			SubTitle:   "Health and status of your Grafana instance",
+			Icon:       "heart",
+			SortWeight: navtree.WeightStatus,
+			Url:        s.cfg.AppSubURL + "/status",
+		})
+	}
+
 	orgAdminNode, err := s.getAdminNode(c)
 
 	if orgAdminNode != nil && len(orgAdminNode.Children) > 0 {
