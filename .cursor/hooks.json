@@ -22,6 +22,9 @@
     ],
     "beforeSubmitPrompt": [
       {
+        "command": ".cursor/hooks/warn-sensitive-api-key.sh"
+      },
+      {
         "command": ".cursor/hooks/audit.sh"
       }
     ]
