@@ -1,4 +1,5 @@
 import { createTheme } from './createTheme';
+import { getBuiltInThemes, getThemeById } from './registry';
 
 describe('createTheme', () => {
   it('create custom theme', () => {
@@ -22,5 +23,14 @@ describe('createTheme', () => {
   it('create default theme', () => {
     const theme = createTheme();
     expect(theme.colors.mode).toBe('dark');
+  });
+
+  it('creates the orange built-in theme', () => {
+    const orange = getThemeById('orange');
+
+    expect(orange.name).toBe('Orange');
+    expect(orange.colors.mode).toBe('dark');
+    expect(orange.colors.primary.main).toBe('#FF8833');
+    expect(getBuiltInThemes(['orange']).some((theme) => theme.id === 'orange')).toBe(true);
   });
 });
