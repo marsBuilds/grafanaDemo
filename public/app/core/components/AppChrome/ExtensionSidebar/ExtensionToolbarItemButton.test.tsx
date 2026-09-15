@@ -49,4 +49,20 @@ describe('ExtensionToolbarItemButton', () => {
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('shows an Ask Grafana label for the assistant plugin when not compact', () => {
+    render(<ExtensionToolbarItemButton isOpen={false} pluginId="grafana-assistant-app" title="Assistant" />);
+
+    const button = screen.getByTestId('extension-toolbar-button-open');
+    expect(button).toHaveAttribute('aria-label', 'Open Ask Grafana');
+    expect(button).toHaveTextContent('Ask Grafana');
+  });
+
+  it('hides the Ask Grafana label in compact mode', () => {
+    render(<ExtensionToolbarItemButton isOpen={false} pluginId="grafana-assistant-app" title="Assistant" compact />);
+
+    const button = screen.getByTestId('extension-toolbar-button-open');
+    expect(button).toHaveAttribute('aria-label', 'Open Ask Grafana');
+    expect(button).not.toHaveTextContent('Ask Grafana');
+  });
 });

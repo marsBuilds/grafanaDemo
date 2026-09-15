@@ -58,6 +58,7 @@ export function ExtensionToolbarItem({ compact }: Props) {
           title={component.title}
           onClick={() => setDockedComponentId(isActive ? undefined : componentId)}
           pluginId={pluginId}
+          compact={compact}
         />
       );
     }
@@ -86,10 +87,11 @@ export function ExtensionToolbarItem({ compact }: Props) {
         title={dockedMeta?.componentTitle}
         onClick={() => setDockedComponentId(undefined)}
         pluginId={pluginId}
+        compact={compact}
       />
     ) : (
       <Dropdown key={pluginId} overlay={MenuItems} placement="bottom-end">
-        <ExtensionToolbarItemButton isOpen={false} pluginId={pluginId} />
+        <ExtensionToolbarItemButton isOpen={false} pluginId={pluginId} compact={compact} />
       </Dropdown>
     );
   };

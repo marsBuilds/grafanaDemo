@@ -7,6 +7,7 @@ import { selectors } from '@grafana/e2e-selectors';
 import { Trans } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { Button, useStyles2, Text, Box, Stack, TextLink, Icon } from '@grafana/ui';
+import { AskGrafanaPrompt } from 'app/features/ask-grafana/AskGrafanaPrompt';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 import { DashboardScene } from 'app/features/dashboard-scene/scene/DashboardScene';
 
@@ -56,6 +57,7 @@ const InternalDashboardEmpty = ({
             />
           ) : (
             <OldLayoutEmpty
+              dashboard={dashboard}
               dashboardLibraryDatasourceUid={dashboardLibraryDatasourceUid}
               onAddVisualization={onAddVisualization}
               onAddLibraryPanel={onAddLibraryPanel}
@@ -87,6 +89,14 @@ const DashboardExtensionsComponents = ({
       )}
   </>
 );
+function getDashboardUid(dashboard: DashboardModel | DashboardScene): string | undefined {
+  if (dashboard instanceof DashboardScene) {
+    return dashboard.state.uid;
+  }
+
+  return dashboard.uid ?? undefined;
+}
+
 interface NewLayoutEmptyProps {
   dashboard: DashboardScene;
   styles: {
@@ -123,6 +133,9 @@ const NewLayoutEmpty = ({ dashboard, styles, dashboardLibraryDatasourceUid }: Ne
             <Trans i18nKey="dashboard.empty.description">Add a panel to visualize your data</Trans>
           </Text>
         </Box>
+        <Box marginTop={3} display="flex" justifyContent="center">
+          <AskGrafanaPrompt origin="grafana/dashboard-empty" dashboardUid={getDashboardUid(dashboard)} variant="cta" />
+        </Box>
       </Box>
       <DashboardExtensionsComponents dashboardLibraryDatasourceUid={dashboardLibraryDatasourceUid} />
     </Stack>
@@ -130,12 +143,14 @@ const NewLayoutEmpty = ({ dashboard, styles, dashboardLibraryDatasourceUid }: Ne
 };
 
 interface OldLayoutEmptyProps {
+  dashboard: DashboardModel | DashboardScene;
   dashboardLibraryDatasourceUid: string | null;
   onAddVisualization?: () => void;
   onAddLibraryPanel?: () => void;
   onImportDashboard?: () => void;
 }
 const OldLayoutEmpty = ({
+  dashboard,
   dashboardLibraryDatasourceUid,
   onAddVisualization,
   onAddLibraryPanel,
@@ -166,6 +181,7 @@ const OldLayoutEmpty = ({
         >
           <Trans i18nKey="dashboard.empty.add-visualization-button">Add visualization</Trans>
         </Button>
+        <AskGrafanaPrompt origin="grafana/dashboard-empty" dashboardUid={getDashboardUid(dashboard)} variant="cta" />
       </Stack>
     </Box>
 

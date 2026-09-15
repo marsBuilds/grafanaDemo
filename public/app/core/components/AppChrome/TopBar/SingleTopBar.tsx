@@ -94,10 +94,10 @@ export const SingleTopBar = memo(function SingleTopBar({
         >
           <TopBarExtensionPoint />
           <TopSearchBarCommandPaletteTrigger />
+          <ExtensionToolbarItem compact={isSmallScreen} />
           {!isSmallScreen && <QuickAdd />}
           <HelpTopBarButton isSmallScreen={isSmallScreen} />
           <NavToolbarSeparator />
-          {!isSmallScreen && <ExtensionToolbarItem compact={isSmallScreen} />}
           {!showToolbarLevel && actions}
           {!contextSrv.user.isSignedIn && <SignInLink />}
           <InviteUserButton />

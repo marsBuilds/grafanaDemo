@@ -93,7 +93,7 @@ describe('ExtensionToolbarItem', () => {
 
     const button = screen.getByTestId('extension-toolbar-button-open');
     expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute('aria-label', `Open ${mockComponent.title}`);
+    expect(button).toHaveAttribute('aria-label', 'Open Ask Grafana');
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
     expect(screen.getByTestId('docked-component-id')).toHaveTextContent('');
   });
@@ -255,7 +255,7 @@ describe('ExtensionToolbarItem', () => {
     expect(buttons).toHaveLength(2);
 
     // Each button should have the correct title
-    expect(buttons[0]).toHaveAttribute('aria-label', 'Open Assistant');
+    expect(buttons[0]).toHaveAttribute('aria-label', 'Open Ask Grafana');
     expect(buttons[1]).toHaveAttribute('aria-label', 'Open Dash');
   });
 });

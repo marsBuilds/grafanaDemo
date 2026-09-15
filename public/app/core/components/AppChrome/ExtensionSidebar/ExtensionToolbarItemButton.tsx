@@ -8,6 +8,7 @@ interface ToolbarItemButtonProps {
   title?: string;
   onClick?: () => void;
   pluginId?: string;
+  compact?: boolean;
 }
 
 function getPluginIcon(pluginId?: string): string {
@@ -25,11 +26,19 @@ function getPluginIcon(pluginId?: string): string {
 }
 
 function ExtensionToolbarItemButtonComponent(
-  { isOpen, title, onClick, pluginId }: ToolbarItemButtonProps,
+  { isOpen, title, onClick, pluginId, compact }: ToolbarItemButtonProps,
   ref: React.ForwardedRef<HTMLButtonElement>
 ) {
   const icon = getPluginIcon(pluginId);
+  const isAssistant = pluginId === 'grafana-assistant-app';
+  const label =
+    !compact && isAssistant ? t('navigation.extension-sidebar.ask-grafana-label', 'Ask Grafana') : undefined;
   const tooltip = (() => {
+    if (isAssistant) {
+      return isOpen
+        ? t('navigation.extension-sidebar.button-tooltip.close-ask-grafana', 'Close Ask Grafana')
+        : t('navigation.extension-sidebar.button-tooltip.open-ask-grafana', 'Open Ask Grafana');
+    }
     if (isOpen) {
       return t('navigation.extension-sidebar.button-tooltip.close', 'Close {{title}}', { title });
     }
@@ -43,13 +52,15 @@ function ExtensionToolbarItemButtonComponent(
     <ToolbarButton
       ref={ref}
       icon={icon}
-      iconOnly
+      iconOnly={!label}
       data-testid={`extension-toolbar-button-${isOpen ? 'close' : 'open'}`}
       variant={isOpen ? 'active' : 'default'}
       aria-expanded={isOpen}
       onClick={onClick}
       tooltip={tooltip}
-    />
+    >
+      {label}
+    </ToolbarButton>
   );
 }
 

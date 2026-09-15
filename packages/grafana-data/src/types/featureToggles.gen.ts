@@ -1533,6 +1533,11 @@ export interface FeatureToggles {
   */
   queryWithAssistant?: boolean;
   /**
+  * Shows Ask Grafana prompts on Home and empty dashboard/Explore states
+  * @default false
+  */
+  askGrafanaHome?: boolean;
+  /**
   * Enables next generation query editor experience
   * @default false
   */
