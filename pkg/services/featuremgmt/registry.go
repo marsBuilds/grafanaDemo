@@ -2427,6 +2427,14 @@ var (
 			Expression:   "false",
 		},
 		{
+			Name:         "askGrafanaHome",
+			Description:  "Shows Ask Grafana prompts on Home and empty dashboard/Explore states",
+			Stage:        FeatureStageExperimental,
+			FrontendOnly: true,
+			Owner:        grafanaDashboardsSquad,
+			Expression:   "false",
+		},
+		{
 			Name:         "queryEditorNext",
 			Description:  "Enables next generation query editor experience",
 			Stage:        FeatureStageExperimental,

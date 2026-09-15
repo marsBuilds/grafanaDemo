@@ -32,6 +32,7 @@ import {
 } from '@grafana/ui';
 import { FILTER_FOR_OPERATOR, FILTER_OUT_OPERATOR } from '@grafana/ui/internal';
 import { supportedFeatures } from 'app/core/history/richHistoryStorageProvider';
+import { AskGrafanaPrompt } from 'app/features/ask-grafana/AskGrafanaPrompt';
 import { MIXED_DATASOURCE_NAME } from 'app/plugins/datasource/mixed/MixedDataSource';
 import { StoreState } from 'app/types/store';
 
@@ -355,6 +356,7 @@ export class Explore extends PureComponent<Props, ExploreState> {
     return (
       <div className={cx(exploreContainerStyles)}>
         <NoDataSourceCallToAction />
+        <AskGrafanaPrompt origin="grafana/explore-empty" variant="cta" />
       </div>
     );
   }
@@ -706,6 +708,7 @@ export class Explore extends PureComponent<Props, ExploreState> {
                         <ResponseErrorContainer exploreId={exploreId} />
                       </PanelContainer>
                     </ContentOutlineItem>
+                    {!showPanels && <AskGrafanaPrompt origin="grafana/explore-empty" variant="cta" />}
                     <AutoSizer onResize={this.onResize} disableHeight>
                       {({ width }) => {
                         if (width === 0) {

@@ -910,6 +910,20 @@
     },
     {
       "metadata": {
+        "name": "askGrafanaHome",
+        "resourceVersion": "1789484270745",
+        "creationTimestamp": "2026-09-15T14:57:50Z"
+      },
+      "spec": {
+        "description": "Shows Ask Grafana prompts on Home and empty dashboard/Explore states",
+        "stage": "experimental",
+        "codeowner": "@grafana/dashboards-squad",
+        "frontend": true,
+        "expression": "false"
+      }
+    },
+    {
+      "metadata": {
         "name": "assetSriChecks",
         "resourceVersion": "1771434338561",
         "creationTimestamp": "2025-03-04T10:56:35Z"

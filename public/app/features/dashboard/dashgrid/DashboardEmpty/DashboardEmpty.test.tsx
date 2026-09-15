@@ -1,6 +1,7 @@
 import { act, fireEvent, screen } from '@testing-library/react';
 import { render } from 'test/test-utils';
 
+import { AssistantHook, useAssistant } from '@grafana/assistant';
 import { config, locationService, reportInteraction } from '@grafana/runtime';
 import { defaultDashboard } from '@grafana/schema';
 
@@ -8,6 +9,13 @@ import { createDashboardModelFixture } from '../../state/__fixtures__/dashboardF
 import { onCreateNewPanel, onImportDashboard, onAddLibraryPanel } from '../../utils/dashboard';
 
 import DashboardEmpty, { type Props } from './DashboardEmpty';
+
+jest.mock('@grafana/assistant', () => ({
+  useAssistant: jest.fn(),
+  createAssistantContextItem: jest.fn((type: string, data: object) => ({ type, ...data })),
+}));
+
+const useAssistantMock = jest.mocked(useAssistant);
 
 jest.mock('app/types/store', () => ({
   ...jest.requireActual('app/types/store'),
@@ -19,6 +27,7 @@ jest.mock('@grafana/runtime', () => ({
   ...jest.requireActual('@grafana/runtime'),
   locationService: {
     partial: jest.fn(),
+    getLocation: jest.fn(() => ({ pathname: '/dashboard/new' })),
     getHistory: jest.fn(() => ({
       listen: jest.fn(),
     })),
@@ -82,6 +91,11 @@ beforeEach(() => {
     isInstanceManaged: false,
     isLoading: false,
   });
+  config.featureToggles.askGrafanaHome = false;
+  useAssistantMock.mockReturnValue({
+    isAvailable: false,
+    openAssistant: undefined,
+  } as unknown as AssistantHook);
 });
 
 it('renders page with correct title for an empty dashboard', () => {
@@ -281,5 +295,37 @@ describe('wrapperMaxWidth CSS class', () => {
     const wrapperElement = container.querySelector('[class*="dashboard-empty-wrapper"]');
     expect(wrapperElement).toBeInTheDocument();
     expect(wrapperElement).not.toHaveStyle('max-width: 890px');
+  });
+
+  it('renders Ask Grafana when the toggle is on and the assistant is available', () => {
+    config.featureToggles.askGrafanaHome = true;
+    useAssistantMock.mockReturnValue({
+      isAvailable: true,
+      openAssistant: jest.fn(),
+    } as unknown as AssistantHook);
+
+    setup();
+
+    expect(screen.getByRole('button', { name: 'Ask Grafana' })).toBeInTheDocument();
+  });
+
+  it('renders an honest fallback when the toggle is on but the assistant is unavailable', () => {
+    config.featureToggles.askGrafanaHome = true;
+    useAssistantMock.mockReturnValue({
+      isAvailable: false,
+      openAssistant: undefined,
+    } as unknown as AssistantHook);
+
+    setup();
+
+    expect(screen.getByTestId('ask-grafana-unavailable')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Ask Grafana' })).not.toBeInTheDocument();
+  });
+
+  it('does not render Ask Grafana when the toggle is off', () => {
+    setup();
+
+    expect(screen.queryByRole('button', { name: 'Ask Grafana' })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ask-grafana-unavailable')).not.toBeInTheDocument();
   });
 });
