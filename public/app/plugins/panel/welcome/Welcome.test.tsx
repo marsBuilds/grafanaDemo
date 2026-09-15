@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'test/test-utils';
 
 import { AssistantHook, useAssistant } from '@grafana/assistant';
 import { config } from '@grafana/runtime';
@@ -15,9 +16,6 @@ jest.mock('@grafana/runtime', () => ({
   getDataSourceSrv: jest.fn(() => ({
     getList: () => [],
   })),
-  locationService: {
-    getLocation: () => ({ pathname: '/' }),
-  },
 }));
 
 const useAssistantMock = jest.mocked(useAssistant);

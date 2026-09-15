@@ -296,6 +296,20 @@ describe('wrapperMaxWidth CSS class', () => {
     expect(wrapperElement).toBeInTheDocument();
     expect(wrapperElement).not.toHaveStyle('max-width: 890px');
   });
+});
+
+describe('Ask Grafana empty state', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockSearchParams.delete('dashboardLibraryDatasourceUid');
+    config.featureToggles.dashboardLibrary = false;
+    config.featureToggles.suggestedDashboards = false;
+    config.featureToggles.askGrafanaHome = false;
+    useAssistantMock.mockReturnValue({
+      isAvailable: false,
+      openAssistant: undefined,
+    } as unknown as AssistantHook);
+  });
 
   it('renders Ask Grafana when the toggle is on and the assistant is available', () => {
     config.featureToggles.askGrafanaHome = true;
@@ -311,10 +325,6 @@ describe('wrapperMaxWidth CSS class', () => {
 
   it('renders an honest fallback when the toggle is on but the assistant is unavailable', () => {
     config.featureToggles.askGrafanaHome = true;
-    useAssistantMock.mockReturnValue({
-      isAvailable: false,
-      openAssistant: undefined,
-    } as unknown as AssistantHook);
 
     setup();
 
