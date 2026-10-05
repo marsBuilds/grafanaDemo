@@ -1,0 +1,62 @@
+{
+  "name": "Neon",
+  "id": "neon",
+  "colors": {
+    "mode": "dark",
+    "border": {
+      "weak": "rgba(255, 43, 214, 0.14)",
+      "medium": "rgba(255, 43, 214, 0.24)",
+      "strong": "rgba(255, 43, 214, 0.36)"
+    },
+    "text": {
+      "primary": "#F2F0FF",
+      "secondary": "rgba(242, 240, 255, 0.75)",
+      "disabled": "rgba(242, 240, 255, 0.5)",
+      "link": "#00F0FF",
+      "maxContrast": "#FFFFFF"
+    },
+    "primary": {
+      "main": "#FF2BD6"
+    },
+    "secondary": {
+      "main": "#24123A",
+      "text": "rgba(242, 240, 255, 0.75)",
+      "border": "rgba(0, 240, 255, 0.16)"
+    },
+    "info": {
+      "main": "#00F0FF"
+    },
+    "success": {
+      "main": "#39FF14"
+    },
+    "warning": {
+      "main": "#FFE600"
+    },
+    "error": {
+      "main": "#FF3864"
+    },
+    "background": {
+      "canvas": "#07050F",
+      "primary": "#0E0A1C",
+      "secondary": "#171030",
+      "elevated": "#171030"
+    },
+    "action": {
+      "hover": "rgba(0, 240, 255, 0.14)",
+      "selected": "rgba(255, 43, 214, 0.16)",
+      "selectedBorder": "#FF2BD6",
+      "focus": "rgba(0, 240, 255, 0.18)",
+      "hoverOpacity": 0.08,
+      "disabledText": "rgba(242, 240, 255, 0.5)",
+      "disabledBackground": "rgba(255, 43, 214, 0.08)",
+      "disabledOpacity": 0.38
+    },
+    "gradients": {
+      "brandHorizontal": "linear-gradient(270deg, #FF2BD6 0%, #00F0FF 50%, #39FF14 100%)",
+      "brandVertical": "linear-gradient(0.01deg, #FF2BD6 0.01%, #00F0FF 50%, #39FF14 99.99%)"
+    },
+    "contrastThreshold": 3,
+    "hoverFactor": 0.05,
+    "tonalOffset": 0.2
+  }
+}
