@@ -6,7 +6,7 @@ import { TestProvider } from 'test/helpers/TestProvider';
 import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
 
 import { DataFrame, DataFrameView, FieldType } from '@grafana/data';
-import { config } from '@grafana/runtime';
+import { config, locationService } from '@grafana/runtime';
 import { HOME_NAV_ID } from 'app/core/reducers/navModel';
 import { getGrafanaSearcher } from 'app/features/search/service/searcher';
 import { DashboardQueryResult, QueryResponse } from 'app/features/search/service/types';
@@ -97,6 +97,18 @@ describe('AppChrome', () => {
     expect(skipLink).toHaveFocus();
     await userEvent.keyboard('{tab}');
     expect(await screen.findByRole('button', { name: 'Main menu' })).toHaveFocus();
+  });
+
+  it('should render a floating top nav on the home page', async () => {
+    act(() => locationService.push('/'));
+    setup(<Page navId="child1">Children</Page>);
+    expect(await screen.findByRole('banner')).toHaveStyle({ top: '8px', left: '8px', right: '8px' });
+  });
+
+  it('should render a full-width top nav on other pages', async () => {
+    act(() => locationService.push('/section/child1'));
+    setup(<Page navId="child1">Children</Page>);
+    expect(await screen.findByRole('banner')).toHaveStyle({ left: '0px', right: '0px' });
   });
 
   it('should not render a skip link if the page is chromeless', async () => {

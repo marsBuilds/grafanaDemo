@@ -24,7 +24,13 @@ import { MegaMenu, MENU_WIDTH } from './MegaMenu/MegaMenu';
 import { useMegaMenuFocusHelper } from './MegaMenu/utils';
 import { ReturnToPrevious } from './ReturnToPrevious/ReturnToPrevious';
 import { SingleTopBar } from './TopBar/SingleTopBar';
-import { getChromeHeaderLevelHeight, useChromeHeaderLevels } from './TopBar/useChromeHeaderHeight';
+import {
+  FLOATING_TOP_NAV_OFFSET,
+  getChromeHeaderLevelHeight,
+  getFloatingTopNavOffset,
+  useChromeHeaderLevels,
+  useIsTopNavFloating,
+} from './TopBar/useChromeHeaderHeight';
 
 export interface Props extends PropsWithChildren<{}> {}
 
@@ -44,7 +50,13 @@ export function AppChrome({ children }: Props) {
   );
 
   const headerLevels = useChromeHeaderLevels();
-  const styles = useStyles2(getStyles, headerLevels, getChromeHeaderLevelHeight());
+  const isTopNavFloating = useIsTopNavFloating() && !state.chromeless;
+  const styles = useStyles2(
+    getStyles,
+    headerLevels,
+    getChromeHeaderLevelHeight(),
+    getFloatingTopNavOffset(headerLevels, isTopNavFloating)
+  );
   const contentSizeStyles = useStyles2(getContentSizeStyles, extensionSidebarWidth);
   const dragStyles = useStyles2(getDragStyles);
 
@@ -98,7 +110,14 @@ export function AppChrome({ children }: Props) {
           {menuDockedAndOpen && (
             <MegaMenu className={styles.dockedMegaMenu} onClose={() => chrome.setMegaMenuOpen(false)} />
           )}
-          <header className={cx(styles.topNav, menuDockedAndOpen && styles.topNavMenuDocked)}>
+          <header
+            className={cx(
+              styles.topNav,
+              menuDockedAndOpen && styles.topNavMenuDocked,
+              isTopNavFloating && styles.topNavFloating,
+              isTopNavFloating && menuDockedAndOpen && styles.topNavFloatingMenuDocked
+            )}
+          >
             <SingleTopBar
               sectionNav={state.sectionNav.node}
               pageNav={state.pageNav}
@@ -184,13 +203,13 @@ function useResponsiveDockedMegaMenu(chrome: AppChromeService) {
   }, [isLargeScreen, chrome, dockedMenuLocalStorageState]);
 }
 
-const getStyles = (theme: GrafanaTheme2, headerLevels: number, headerHeight: number) => {
+const getStyles = (theme: GrafanaTheme2, headerLevels: number, headerHeight: number, floatingOffset: number) => {
   return {
     content: css({
       label: 'page-content',
       display: 'flex',
       flexDirection: 'column',
-      paddingTop: headerLevels * headerHeight,
+      paddingTop: headerLevels * headerHeight + floatingOffset,
       flexGrow: 1,
       height: 'auto',
     }),
@@ -236,6 +255,22 @@ const getStyles = (theme: GrafanaTheme2, headerLevels: number, headerHeight: num
     topNavMenuDocked: css({
       left: MENU_WIDTH,
     }),
+    topNavFloating: css({
+      label: 'top-nav-floating',
+      top: FLOATING_TOP_NAV_OFFSET,
+      left: FLOATING_TOP_NAV_OFFSET,
+      right: FLOATING_TOP_NAV_OFFSET,
+      borderRadius: theme.shape.radius.lg,
+      overflow: 'hidden',
+      // A ring shadow instead of a border keeps the bar height aligned with getChromeHeaderLevelHeight()
+      boxShadow: `${theme.shadows.z3}, 0 0 0 1px ${theme.colors.border.weak}`,
+      '& > :last-child': {
+        borderBottomColor: 'transparent',
+      },
+    }),
+    topNavFloatingMenuDocked: css({
+      left: `calc(${MENU_WIDTH} + ${FLOATING_TOP_NAV_OFFSET}px)`,
+    }),
     panes: css({
       display: 'flex',
       flexDirection: 'column',
@@ -278,7 +313,7 @@ const getStyles = (theme: GrafanaTheme2, headerLevels: number, headerHeight: num
       // the `Resizeable` component overrides the needed `position` and `height`
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       position: 'fixed !important' as 'fixed',
-      top: headerHeight,
+      top: headerHeight + floatingOffset,
       bottom: 0,
       zIndex: theme.zIndex.navbarFixed + 1,
       right: 0,

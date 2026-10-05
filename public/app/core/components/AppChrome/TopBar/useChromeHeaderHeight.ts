@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { config, useScopes } from '@grafana/runtime';
 import { useGrafana } from 'app/core/context/GrafanaContext';
@@ -7,6 +8,9 @@ import { isDashboardSceneEnabled } from 'app/features/dashboard-scene/utils/util
 
 import { AppChromeState } from '../AppChromeService';
 import { useExtensionSidebarContext } from '../ExtensionSidebar/ExtensionSidebarProvider';
+
+/** Gap in px between the viewport edges and the floating top nav */
+export const FLOATING_TOP_NAV_OFFSET = 8;
 
 /**
  * Returns the current header levels given current app chrome state, scopes and screen size.
@@ -35,6 +39,13 @@ export function useChromeHeaderLevels() {
   }, [chrome, headerLevels, scopes, isLargeScreen]);
 
   return headerLevels;
+}
+
+/**
+ * The top nav floats (inset from the viewport edges) on the home page only.
+ */
+export function useIsTopNavFloating() {
+  return useLocation().pathname === '/';
 }
 
 function getHeaderLevelsGivenState(
@@ -79,6 +90,7 @@ function getHeaderLevelsGivenState(
  */
 export function useChromeHeaderHeight() {
   const levels = useChromeHeaderLevels();
+  const isTopNavFloating = useIsTopNavFloating();
 
   // if the extension sidebar is open, the inner pane will be scrollable, thus we need to set the header height to 0
   const { isOpen: isExtensionSidebarOpen } = useExtensionSidebarContext();
@@ -87,7 +99,14 @@ export function useChromeHeaderHeight() {
     return 0;
   }
 
-  return levels * getChromeHeaderLevelHeight();
+  return levels * getChromeHeaderLevelHeight() + getFloatingTopNavOffset(levels, isTopNavFloating);
+}
+
+/**
+ * Extra top space taken by the floating top nav, zero when the nav isn't floating or isn't shown
+ */
+export function getFloatingTopNavOffset(levels: number, isTopNavFloating: boolean) {
+  return isTopNavFloating && levels > 0 ? FLOATING_TOP_NAV_OFFSET : 0;
 }
 
 /**
